@@ -1,0 +1,508 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator custom_generator {
+    provider = "prisma-generator-fake-data"
+    output   = "./types/fake-data.ts"
+}
+
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
+
+generator nestjsDto {
+  provider                        = "prisma-generator-nestjs-dto"
+  output                          = "./generated/dto"
+  outputToNestJsResourceStructure = "true"
+  flatResourceStructure           = "false"
+  exportRelationModifierClasses   = "true"
+  reExport                        = "true"
+  generateFileTypes               = "all"
+  createDtoPrefix                 = "Create"
+  updateDtoPrefix                 = "Update"
+  dtoSuffix                       = "Dto"
+  entityPrefix                    = ""
+  entitySuffix                    = ""
+  classValidation                 = "true"
+  fileNamingStyle                 = "camel"
+  noDependencies                  = "false"
+  outputType                      = "class"
+  definiteAssignmentAssertion     = "false"
+  requiredResponseApiProperty     = "true"
+  prettier                        = "true"
+  outputApiPropertyType           = "true"
+}
+generator zod {
+  provider = "zod-prisma"
+  output   = "./generated/zod" // (default) the directory where generated zod schemas will be saved
+
+  relationModel = true // (default) Create and export both plain and related models.
+  // relationModel         = "default" // Do not export model without relations.
+  // relationModel         = false // Do not generate related model
+
+  modelCase = "PascalCase" // (default) Output models using pascal case (ex. UserModel, PostModel)
+  // modelCase             = "camelCase" // Output models using camel case (ex. userModel, postModel)
+
+  modelSuffix = "Model" // (default) Suffix to apply to your prisma models when naming Zod schemas
+
+  // useDecimalJs          = false // (default) represent the prisma Decimal type using as a JS number
+  useDecimalJs = true // represent the prisma Decimal type using Decimal.js (as Prisma does)
+
+  imports = null // (default) will import the referenced file in generated schemas to be used via imports.someExportedVariable
+
+  // https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-by-null-values
+  prismaJsonNullability = true // (default) uses prisma's scheme for JSON field nullability
+  // prismaJsonNullability = false // allows null assignment to optional JSON fields
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Notification {
+  id              String             @id @default(uuid()) @db.Char(36)
+  sender          String?
+  title           String
+  message         String
+  photoUrl        String?
+  dtCreated       DateTime           @default(now())
+  receiver        UserNotification[]
+  sentAt          DateTime
+  @@map("notification")
+}
+
+enum NotificationStatus {
+  Pending
+  Sent
+  Failed
+  Delivered
+  Readed
+}
+
+model UserNotification {
+  id                String  @id @default(uuid()) @db.Char(36)
+  userId            String @map("user_id") @db.Char(36)
+  notification_id   String @map("notif_id") @db.Char(36)
+  status            NotificationStatus 
+  user  User         @relation(fields: [userId], references: [id])
+  notif Notification @relation(fields: [notification_id], references: [id])
+
+  @@unique([userId, notification_id])
+}
+
+model Profile {
+  id         String    @id @default(uuid()) @db.Char(36)
+  userId     String    @unique @map("user_id") @db.VarChar(36)
+  name       String    @db.VarChar(50)
+  profilePic String?   @map("photo") @db.VarChar(255)
+  phone      String?   @db.VarChar(30)
+  address    String?   @db.VarChar(255)
+  position   String    @db.VarChar(30)
+
+  userCreated  String?   @map("user_created") @db.VarChar(36)
+  userModified String?   @map("user_modified") @db.VarChar(36)
+  dtCreated    DateTime  @default(now()) @map("date_created")
+  dtModified   DateTime? @updatedAt @map("date_modified")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("profiles")
+  Participant Participant[]
+}
+
+model User {
+  id             String    @id @default(uuid()) @db.Char(36)
+  email          String?  @unique
+  username       String   @unique
+  hashedPassword String   @map("hashed_password") @db.VarChar(100)
+  hashedRT       String?  @map("hashed_rt") @db.VarChar(100)
+  isConfirmed    Boolean  @default(false)
+  createdAt      DateTime  @default(now()) @map("date_created")
+  updatedAt      DateTime? @updatedAt @map("date_modified")
+  profile        Profile?
+
+  UserNotification UserNotification[]
+
+  Position Position[]
+
+  Participant Participant[]
+}
+
+enum Boundary {
+  Permanen
+  Sementara
+  Tanpa_Batasan
+}
+
+model TransactionCategory {
+  id          String    @id @default(uuid()) @db.Char(36)
+  name        String
+  description String
+  boundary    Boundary
+  createdAt   DateTime  @default(now()) @map("date_created")
+  updatedAt   DateTime? @updatedAt @map("date_modified")
+  activity    TransactionActivity[]
+}
+
+model TransactionActivity {
+  id              String    @id @default(uuid()) @db.Char(36)
+  categoryId      String    @db.Char(36)
+  debitAccountId  String           @db.Char(36)
+  creditAccountId String           @db.Char(36)
+  name            String
+  debitAccount    Account             @relation(name:"debitEntry", fields: [debitAccountId], references: [id])
+  creditAccount   Account             @relation(name:"creditEntry", fields: [creditAccountId], references: [id])
+  createdAt       DateTime  @default(now()) @map("date_created")
+  updatedAt       DateTime? @updatedAt @map("date_modified")
+  category        TransactionCategory?       @relation(fields: [categoryId], references: [id])
+  Transaction     Transaction[]
+}
+
+
+enum NormalBalance {
+  DEBIT
+  CREDIT
+}
+
+enum TransactionType {
+  Pengeluaran
+  Penerimaan
+}
+
+model Transaction {
+  id              String           @id @default(uuid()) @db.Char(36)
+  accountId       String           @db.Char(36)
+  activityId      String           @db.Char(36)
+  vendorId        String?          @db.Char(36)
+  mediaId         String?          @db.Char(36)
+  programId       String?          @db.Char(36)
+  type            TransactionType
+  description     String
+  refCode         String?
+  dtTrx           DateTime
+  amount          Decimal
+  activity        TransactionActivity   @relation(fields: [activityId], references: [id])
+  vendor          Vendor?               @relation(fields: [vendorId], references: [id])
+  PAP             Media?                @relation(fields: [mediaId], references: [id])
+  program         Program?              @relation(fields: [programId], references: [id])
+  createdAt       DateTime              @default(now()) @map("date_created")
+  updatedAt       DateTime?             @updatedAt @map("date_modified")
+  createdBy       String
+  updatedBy       String?
+}
+
+enum ProgramStatus {
+  Fundraising
+  OnProgress
+  Completed
+}
+
+model Program {
+  id                  String  @id @default(uuid()) @db.Char(36)
+  budget              Decimal
+  realisation         Decimal
+  uptake              Decimal
+  status              ProgramStatus
+  createdAt           DateTime  @default(now()) @map("date_created")
+  updatedAt           DateTime? @updatedAt @map("date_modified")
+  transaction         Transaction[]
+}
+
+enum AccountType {
+  Asset
+  Liability
+  Equity
+  Income
+  Expense
+}
+
+model Account {
+  id                  String  @id @default(uuid()) @db.Char(36)
+  parentAccountId     String? @db.Char(36)// For hierarchical accounts
+  code                String
+  name                String
+  type                AccountType
+  description         String
+  startBalance        Decimal
+  currentBalance      Decimal?
+  createdAt           DateTime  @default(now()) @map("date_created")
+  updatedAt           DateTime? @updatedAt @map("date_modified")
+  parent              Account?  @relation("NestedAccount", fields: [parentAccountId], references: [id])
+  children            Account[] @relation("NestedAccount")
+  debitEntries        TransactionActivity[] @relation(name: "debitEntry")
+  creditEntries       TransactionActivity[] @relation(name: "creditEntry")
+  ledger              Ledger[]
+  BankAccount         BankAccount[]
+}
+
+model BankAccount {
+  id            String  @id @default(uuid()) @db.Char(36)
+  accountId     String
+  bankName      String
+  accountNumber String
+  onBehalfOf    String
+  description   String
+  createdAt     DateTime @default(now()) @map("date_created")
+  updatedAt     DateTime? @updatedAt @map("date_modified") 
+  account       Account   @relation(fields: [accountId], references: [id])
+}
+
+// model TrialBalance {
+//   id          String  @id @default(uuid()) @db.Char(36)
+//   ledgerId    String  @db.Char(36)
+//   periodStart DateTime
+//   periodEnd   DateTime
+//   totalDebit  Decimal
+//   totalCredit Decimal
+//   createdAt   DateTime @default(now()) @map("date_created")
+//   updatedAt   DateTime? @updatedAt @map("date_modified")
+  
+//   ledger      Ledger  @relation(fields: [ledgerId], references: [id])
+//   TrialBalanceDetail TrialBalanceDetail[]
+// }
+
+// model TrialBalanceDetail {
+//   id              String  @id @default(uuid()) @db.Char(36)
+//   trialBalanceId  String  @db.Char(36)
+//   accountId       String  @db.Char(36)
+//   isDebit         Boolean @default(true)
+//   openingBalance  Decimal
+//   closingBalance  Decimal
+//   account         Account  @relation(fields: [accountId], references: [id])
+//   trialBalance    TrialBalance  @relation(fields: [trialBalanceId], references: [id])
+//   createdAt       DateTime @default(now()) @map("date_created")
+//   updatedAt       DateTime? @updatedAt @map("date_modified")
+// }
+
+model Ledger {
+  id          String  @id @default(uuid()) @db.Char(36)
+  name        String
+  description String
+
+  createdAt   DateTime @default(now()) @map("date_created")
+  updatedAt   DateTime? @updatedAt @map("date_modified")
+
+  reportPeriod Period // Enum: DAILY, WEEKLY, MONTHLY, QUARTERLY, YEARLY
+  startWeekDay WeekDay // Enum: MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY
+  accounts     Account[]
+  // TrialBalance TrialBalance[]
+}
+
+enum WeekDay {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum Period {
+  DAILY
+  WEEKLY
+  MONTHLY
+  QUARTERLY
+  YEARLY
+}
+
+model Vendor {
+  id            String         @id @default(uuid()) @db.Char(36)
+  name          String
+  phone         String
+  address       String
+  businessField String         @map("jenis_usaha")
+  note          String
+  createdAt     DateTime       @default(now()) @map("date_created")
+  updatedAt     DateTime?      @updatedAt @map("date_modified")
+  journalEntry  Transaction[]
+}
+
+model Media {
+  id  String  @id @default(uuid()) @db.Char(36)
+  img Image[]
+
+  Transaction Transaction[]
+}
+
+model Image {
+  id        String    @id @default(uuid()) @db.Char(36)
+  mediaId   String?
+  caption   String
+  url       String
+  createdAt DateTime  @default(now()) @map("date_created")
+  updatedAt DateTime? @updatedAt @map("date_modified")
+
+  container Media? @relation(fields: [mediaId], references: [id])
+}
+
+enum AcquisitionOrigin {
+  Donation
+  Purchase
+  Lease
+  Rental
+  Pledges
+  MosqueBuildingFund
+  RemnantProgramFund
+  InvestmentReturns
+  Grants
+  Other
+}
+
+enum AssetTypes {
+    Fixed
+    NonFixed
+    Current
+    NonCurrent
+}
+model Asset {
+  id                String  @id @default(uuid()) @db.Char(36)
+  name              String  @map("nama_aset")
+  description       String    @map("deskripsi")
+
+  date_acquired     DateTime
+  economicLife      Int       @map("umur_ekonomis")
+  qty               Int       @map("kuantitas")
+   
+  createdAt         DateTime  @default(now()) @map("date_created")
+  updatedAt         DateTime? @updatedAt      @map("date_modified")
+  createdBy         String
+  editedBy          String
+
+  type              AssetTypes        @map("jenis_aset")
+  origin            AcquisitionOrigin @map("asal_perolehan")
+  AssetStatus       AssetStatus[]
+
+
+  assetTags AssetTags[]
+}
+
+model AssetStatus {
+  id            String  @id @default(uuid()) @db.Char(36)
+  assetId       String  @db.Char(36)
+
+  availableQty  Int
+  totalQty      Int
+  note          String
+
+  updatedBy     String  @db.Char(36)
+  updatedAt     DateTime? @updatedAt      @map("date_modified")
+
+  asset       Asset     @relation(fields: [assetId], references: [id])
+}
+
+model Tag {
+  id            String  @id @default(uuid()) @db.Char(36)
+  name          String
+  description   String
+  createdAt     DateTime  @default(now()) @map("date_created")
+  updatedAt     DateTime? @updatedAt @map("date_modified")
+
+  assetTags AssetTags[]
+}
+
+model AssetTags {
+  id            String  @id @default(uuid()) @db.Char(36)
+  assetId       String @map("aset_id") @db.Char(36)
+  tagId         String @map("tag_id") @db.Char(36)
+
+  asset         Asset         @relation(fields: [assetId], references: [id])
+  tag           Tag           @relation(fields: [tagId], references: [id])
+
+  @@unique([assetId, tagId])
+}
+
+
+model Position {
+  id                  String  @id @default(uuid()) @db.Char(36)
+  userId              String  @db.Char(36) @unique
+  eventId             String?
+  name                String
+  periode             String
+
+  createdAt           DateTime  @default(now()) @map("date_created")
+  updatedAt           DateTime? @updatedAt @map("date_modified")
+  user                User      @relation(fields: [userId], references: [id])
+  event               Event?      @relation(fields: [eventId], references: [id])
+}
+
+model FamilyMember {
+  id            String  @id @default(uuid()) @db.Char(36)
+  participantId String  @db.Char(36)
+  name          String
+  information   String
+  relationType  String
+  guardian      Participant @relation(fields: [participantId], references: [userId])
+}
+
+model Participant {
+  id                String  @id @default(uuid()) @db.Char(36)
+  userId            String @map("user_id") @db.Char(36) @unique
+  eventId           String @map("event_id") @db.Char(36)
+  profileId         String  @db.Char(36)
+  emergencyId       String  @db.Char(36)
+  withFamily        Boolean
+  createdAt         DateTime  @default(now()) @map("date_created")
+  updatedAt         DateTime? @updatedAt @map("date_modified")
+  profile           Profile   @relation(fields: [profileId], references: [id])
+  emergencyContact  EmergencyContact   @relation(fields: [emergencyId], references: [id])
+  user              User      @relation(fields: [userId], references: [id])
+  event             Event     @relation(fields: [eventId], references: [id])
+  member            FamilyMember[]
+  @@unique([userId, eventId])
+}
+
+model EmergencyContact {
+  id            String  @id @default(uuid()) @db.Char(36)
+  name          String
+  phone         String
+  relationType  String
+  createdAt     DateTime  @default(now()) @map("date_created")
+  updatedAt     DateTime? @updatedAt @map("date_modified")
+
+  Participant   Participant[]
+}
+
+model Ustadz {
+  id            String  @id @default(uuid()) @db.Char(36)
+  name          String
+  phone         String
+  address       String
+  attendAs      UstadzEvent[]
+}
+
+model UstadzEvent  {
+  id        String  @id @default(uuid()) @db.Char(36)
+  ustadzId  String
+  eventId   String
+  
+  Ustadz    Ustadz   @relation(fields: [ustadzId], references: [id])
+  Event     Event   @relation(fields: [eventId], references: [id])
+  
+  @@unique([ustadzId, eventId])
+}
+
+model Event {
+  id            String  @id @default(uuid()) @db.Char(36)
+  name          String
+  place         String
+  dtStart       DateTime
+  dtEnd         DateTime
+  quota         Int
+  description   String
+  heldPeriod    Period?
+  createdAt     DateTime  @default(now()) @map("date_created")
+  updatedAt     DateTime? @updatedAt @map("date_modified")
+  createdBy     String
+  participant   Participant[]
+  team          Position[]
+  speakers      UstadzEvent[]
+}
