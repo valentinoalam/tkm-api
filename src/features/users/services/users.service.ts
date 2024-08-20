@@ -13,10 +13,10 @@ import { hash, verify } from 'argon2';
 import { DatabaseService } from '@core/database/database.service';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { User as UserEntity } from '../entities/user.entity';
-import { Profile } from '../entities/profile.entity';
-import { UpdateProfileDto } from '../dto/update-profile.dto';
-import * as fakeData from 'src/shared/fake-data'; 
-import { CreateProfileDto } from '../dto';
+import * as fakeData from '@/shared/fake-data'; 
+import { Profile } from '../components/profile/entities/profile.entity';
+import { UpdateProfileDto } from '../components/profile/dto'
+import { CreateProfileDto } from '../components/profile/dto';
 import * as fs from 'fs';
 
 @Injectable()
@@ -245,9 +245,13 @@ export class UsersService {
     ];
     if (dto.hashedPassword) updateData.hashedPassword = await hash(dto.hashedPassword);
     delete dto.hashedPassword;
+
     let filteredDto: any = {};
+
     let filteredUserDto: Partial<UserEntity> = {};
+
     let filteredProfileDto: Partial<Profile> = {};
+    
     for (const prop in dto) {
       if (dto[prop]) {
         filteredDto[prop] = dto[prop];
@@ -276,12 +280,30 @@ export class UsersService {
       ...filteredUserDto,
       updatedAt: new Date(),
     };
+
     const updatedUser = await this.db.user
       .update({
         where: { id: id },
         data: {
           ...updateData,
-          profile: { update: filteredProfileDto },
+          profile: { 
+            update: {
+              name: filteredProfileDto.name,
+              profilePic: filteredProfileDto.profilePic,
+              phone: filteredProfileDto.phone,
+              address: filteredProfileDto.address,
+              position: filteredProfileDto.position
+            } 
+          },
+          userNotification: {
+            // Update logic for user notifications
+          },
+          position: {
+            // Update logic for positions
+          },
+          participant: {
+            // Update logic for participants
+          },
         },
         include: {
           profile: true,
@@ -289,11 +311,13 @@ export class UsersService {
       })
       .catch((error) => {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
-          if (error.code === 'P2002')
+          if (error.code === 'P2002') {
             throw new ForbiddenException('Username/Email/NIK already taken.');
+          }
         }
         throw error;
       });
+
 
     return updatedUser;
   }

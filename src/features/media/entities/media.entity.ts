@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Image } from '@/generated/nestjs-dto/image/entities';
-
+import { Image } from '../image/entities/image.entity';
+import { Transaction } from '@/features/ledger/components/transactions/entities/transaction.entity';
 export class Media {
   @ApiProperty({
     type: 'string',
@@ -12,4 +12,10 @@ export class Media {
     required: false,
   })
   img?: Image[];
+  @ApiProperty({
+    type: () => Transaction,
+    isArray: true,
+    required: false,
+  })
+  Transaction?: Transaction[];
 }

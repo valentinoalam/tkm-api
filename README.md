@@ -1,73 +1,168 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Aplikasi Tata Kelola Masjid
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Tujuan dibuatnya Aplikasi Web Sistem Tata Kelola Masjid dan Website Pelayanan Masjid adalah untuk meningkatkan efisiensi pengelolaan melalui pengaturan inventaris, keuangan, kegiatan, zakat, qurban, dan aktivitas lainnya secara terstruktur dan transparan. Dengan menyediakan laporan yang jelas dan dapat diakses oleh jamaah, aplikasi ini meningkatkan transparansi dan akuntabilitas, serta memudahkan akses informasi seperti jadwal ceramah, kegiatan rutin, dan fasilitas masjid. Selain itu, aplikasi ini mempermudah jamaah dalam melakukan pendaftaran itiqaf, pembayaran zakat, pendaftaran qurban, dan konsultasi zakat secara online, sehingga pelayanan menjadi lebih cepat dan efisien. Aplikasi ini juga memungkinkan penyimpanan dan akses mudah terhadap dokumentasi kegiatan, laporan, dan arsip penting lainnya, serta mendorong interaksi yang lebih baik antara pengurus masjid dan jamaah, meningkatkan partisipasi aktif jamaah dalam kegiatan dan program masjid.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Usecase
 
-## Description
+1. Pencatatan Pemasukan
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+    - Pencatatan semua sumber pemasukan kas masjid seperti sumbangan, donasi, dan dana lainnya dari muzakki.
 
-## Installation
+2. Pencatatan Pengeluaran
 
-```bash
-$ yarn install
-```
+    - Pencatatan semua pengeluaran yang dilakukan oleh masjid seperti biaya operasional, pembayaran gaji staf, dan pengeluaran lainnya.
 
-## Running the app
+3. Pelaporan Keuangan
 
-```bash
-# development
-$ yarn run start
+    - Membuat laporan keuangan reguler yang mencakup ringkasan pemasukan dan pengeluaran kas masjid.
+    - Laporan bulanan, tahunan, dan laporan khusus lainnya sesuai kebutuhan.
 
-# watch mode
-$ yarn run start:dev
+4. Perencanaan Anggaran
 
-# production mode
-$ yarn run start:prod
-```
+    - Perencanaan dan pengawasan terhadap anggaran kas masjid untuk pengeluaran dan proyek-proyek tertentu.
 
-## Test
+5. Pengelolaan Kas Kecil
 
-```bash
-# unit tests
-$ yarn run test
+    - Pengelolaan kas kecil untuk kebutuhan sehari-hari masjid seperti pembelian kecil atau biaya operasional harian.
 
-# e2e tests
-$ yarn run test:e2e
+6. Manajemen Zakat dan Sedekah
 
-# test coverage
-$ yarn run test:cov
-```
+    - Pengelolaan zakat dan sedekah yang diterima dan dikelola oleh masjid untuk diberikan kepada mustahik.
 
-## Support
+7. Audit Keuangan
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+    - Proses audit rutin untuk memastikan keakuratan pencatatan dan transparansi dalam pengelolaan keuangan masjid.
 
-## Stay in touch
+8. Pelacakan Sumber Dana
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+    - Pelacakan sumber dana yang digunakan untuk pengeluaran tertentu untuk memastikan dana digunakan sesuai dengan ketentuan yang berlaku
 
-## License
+9. Pemantauan dan Evaluasi
+    - Pemantauan secara berkala terhadap kondisi keuangan masjid dan evaluasi terhadap efektivitas pengelolaan dana dan penggunaan kas.
 
-Nest is [MIT licensed](LICENSE).
+10. Pembatasan Akses Informasi Keuangan
+
+## 1. User Management Service
+
+**Fungsi:**
+
+- Autentikasi dan otorisasi pengguna
+- Pendaftaran dan manajemen profil pengguna (administrator masjid, imam, jamaah)
+
+**Endpoint:**
+
+- `POST /register`
+- `POST /login`
+- `GET /profile/{userId}`
+- `PUT /profile/{userId}`
+
+## 2. Prayer Schedule Service
+
+**Fungsi:**
+
+- Manajemen jadwal sholat
+- Penentuan waktu sholat berdasarkan lokasi masjid
+
+**Endpoint:**
+
+- `GET /prayerschedule/{mosqueId}`
+- `POST /prayerschedule`
+- `PUT /prayerschedule/{scheduleId}`
+
+## 3. Event Management Service
+
+**Fungsi:**
+
+- Penjadwalan dan manajemen acara (pengajian, ceramah, kegiatan sosial)
+- Notifikasi acara kepada jamaah
+
+**Endpoint:**
+
+- `GET /events/{mosqueId}`
+- `POST /events`
+- `PUT /events/{eventId}`
+- `DELETE /events/{eventId}`
+
+## 4. Financial Management Service
+
+**Fungsi:**
+
+- Pencatatan pemasukan dan pengeluaran masjid
+- Manajemen donasi dan zakat
+
+**Endpoint:**
+
+- `GET /finances/{mosqueId}`
+- `POST /donations`
+- `POST /expenses`
+- `GET /reports/{mosqueId}`
+
+## 5. Notification Service
+
+**Fungsi:**
+
+- Pengiriman notifikasi ke pengguna (SMS, Email, Push Notifications)
+
+**Endpoint:**
+
+- `POST /notifications`
+
+## 6. Volunteer Management Service
+
+**Fungsi:**
+
+- Manajemen relawan untuk berbagai kegiatan masjid
+
+**Endpoint:**
+
+- `GET /volunteers/{mosqueId}`
+- `POST /volunteers`
+- `PUT /volunteers/{volunteerId}`
+- `DELETE /volunteers/{volunteerId}`
+
+## 7. Content Management Service
+
+**Fungsi:**
+
+- Manajemen konten dakwah (artikel, video, audio)
+
+**Endpoint:**
+
+- `GET /content/{mosqueId}`
+- `POST /content`
+- `PUT /content/{contentId}`
+- `DELETE /content/{contentId}`
+
+## 8. Feedback and Suggestion Service
+
+**Fungsi:**
+
+- Pengumpulan dan manajemen saran serta feedback dari jamaah
+
+**Endpoint:**
+
+- `POST /feedback`
+- `GET /feedback/{mosqueId}`
+
+## 9. Maintenance Service
+
+**Fungsi:**
+
+- Manajemen pemeliharaan dan perbaikan fasilitas masjid
+
+**Endpoint:**
+
+- `GET /maintenance/{mosqueId}`
+- `POST /maintenance`
+- `PUT /maintenance/{maintenanceId}`
+- `DELETE /maintenance/{maintenanceId}`
+
+## 10. Analytics Service
+
+**Fungsi:**
+
+- Analisis data aktivitas masjid (kehadiran sholat, kehadiran acara, jumlah donasi)
+
+**Endpoint:**
+
+- `GET /analytics/{mosqueId}`

@@ -1,4 +1,19 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreatePositionDto } from './create-position.dto';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsOptional, IsString } from 'class-validator';
 
-export class UpdatePositionDto extends PartialType(CreatePositionDto) {}
+export class UpdatePositionDto {
+  @ApiProperty({
+    type: 'string',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  name?: string;
+  @ApiProperty({
+    type: 'string',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  periode?: string;
+}

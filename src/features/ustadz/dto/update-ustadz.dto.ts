@@ -1,4 +1,26 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateUstadzDto } from './create-ustadz.dto';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsOptional, IsString } from 'class-validator';
 
-export class UpdateUstadzDto extends PartialType(CreateUstadzDto) {}
+export class UpdateUstadzDto {
+  @ApiProperty({
+    type: 'string',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  name?: string;
+  @ApiProperty({
+    type: 'string',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  phone?: string;
+  @ApiProperty({
+    type: 'string',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  address?: string;
+}

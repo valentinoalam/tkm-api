@@ -8,15 +8,26 @@ generator client {
   provider = "prisma-client-js"
 }
 
-generator custom_generator {
-    provider = "prisma-generator-fake-data"
-    output   = "./types/fake-data.ts"
-}
+// generator custom_generator {
+//     provider = "prisma-generator-fake-data"
+//     output   = "./types/fake-data.ts"
+// }
 
-generator dbml {
-  provider = "prisma-dbml-generator"
-}
+// generator dbml {
+//   provider = "prisma-dbml-generator"
+// }
 
+// generator erd {
+//   provider = "prisma-erd-generator"
+//    theme = "forest"   //default (default), forest, dark, neutral
+//    disabled = false
+//    includeRelationFromFields = true
+// }
+
+// generator docs {
+//   provider = "node node_modules/prisma-docs-generator"
+//   output = "../docs"
+// }
 generator nestjsDto {
   provider                        = "prisma-generator-nestjs-dto"
   output                          = "./generated/dto"
@@ -92,8 +103,11 @@ model UserNotification {
   userId            String @map("user_id") @db.Char(36)
   notification_id   String @map("notif_id") @db.Char(36)
   status            NotificationStatus 
-  user  User         @relation(fields: [userId], references: [id])
-  notif Notification @relation(fields: [notification_id], references: [id])
+
+  createdAt       DateTime    @default(now())
+  readAt          DateTime?
+  user  User?         @relation(fields: [userId], references: [id])
+  notif Notification  @relation(fields: [notification_id], references: [id])
 
   @@unique([userId, notification_id])
 }
@@ -129,11 +143,11 @@ model User {
   updatedAt      DateTime? @updatedAt @map("date_modified")
   profile        Profile?
 
-  UserNotification UserNotification[]
+  userNotification UserNotification[]
 
-  Position Position[]
+  position    Position[]
 
-  Participant Participant[]
+  participant Participant[]
 }
 
 enum Boundary {
@@ -154,22 +168,16 @@ model TransactionCategory {
 
 model TransactionActivity {
   id              String    @id @default(uuid()) @db.Char(36)
-  categoryId      String    @db.Char(36)
-  debitAccountId  String           @db.Char(36)
-  creditAccountId String           @db.Char(36)
+  categoryId      String                @db.Char(36)
+  debitAccountId  String                @db.Char(36)
+  creditAccountId String                @db.Char(36)
   name            String
-  debitAccount    Account             @relation(name:"debitEntry", fields: [debitAccountId], references: [id])
-  creditAccount   Account             @relation(name:"creditEntry", fields: [creditAccountId], references: [id])
-  createdAt       DateTime  @default(now()) @map("date_created")
-  updatedAt       DateTime? @updatedAt @map("date_modified")
-  category        TransactionCategory?       @relation(fields: [categoryId], references: [id])
+  debitAccount    Account               @relation(name:"debitEntry", fields: [debitAccountId], references: [id])
+  creditAccount   Account               @relation(name:"creditEntry", fields: [creditAccountId], references: [id])
+  createdAt       DateTime              @default(now()) @map("date_created")
+  updatedAt       DateTime?             @updatedAt @map("date_modified")
+  category        TransactionCategory?  @relation(fields: [categoryId], references: [id])
   Transaction     Transaction[]
-}
-
-
-enum NormalBalance {
-  DEBIT
-  CREDIT
 }
 
 enum TransactionType {
@@ -179,7 +187,6 @@ enum TransactionType {
 
 model Transaction {
   id              String           @id @default(uuid()) @db.Char(36)
-  accountId       String           @db.Char(36)
   activityId      String           @db.Char(36)
   vendorId        String?          @db.Char(36)
   mediaId         String?          @db.Char(36)
@@ -231,7 +238,7 @@ model Account {
   name                String
   type                AccountType
   description         String
-  startBalance        Decimal
+  startBalance        Decimal?
   currentBalance      Decimal?
   createdAt           DateTime  @default(now()) @map("date_created")
   updatedAt           DateTime? @updatedAt @map("date_modified")
@@ -255,32 +262,27 @@ model BankAccount {
   account       Account   @relation(fields: [accountId], references: [id])
 }
 
-// model TrialBalance {
-//   id          String  @id @default(uuid()) @db.Char(36)
-//   ledgerId    String  @db.Char(36)
-//   periodStart DateTime
-//   periodEnd   DateTime
-//   totalDebit  Decimal
-//   totalCredit Decimal
-//   createdAt   DateTime @default(now()) @map("date_created")
-//   updatedAt   DateTime? @updatedAt @map("date_modified")
-  
-//   ledger      Ledger  @relation(fields: [ledgerId], references: [id])
-//   TrialBalanceDetail TrialBalanceDetail[]
-// }
+model TrialBalance {
+  id          String  @id @default(uuid()) @db.Char(36)
+  ledgerId    String  @db.Char(36)
+  periodStart DateTime
+  periodEnd   DateTime
+  totalDebit  Decimal
+  totalCredit Decimal
+  createdAt   DateTime @default(now()) @map("date_created")
+  ledger      Ledger  @relation(fields: [ledgerId], references: [id])
+  TrialBalanceDetail TrialBalanceDetail[]
+}
 
-// model TrialBalanceDetail {
-//   id              String  @id @default(uuid()) @db.Char(36)
-//   trialBalanceId  String  @db.Char(36)
-//   accountId       String  @db.Char(36)
-//   isDebit         Boolean @default(true)
-//   openingBalance  Decimal
-//   closingBalance  Decimal
-//   account         Account  @relation(fields: [accountId], references: [id])
-//   trialBalance    TrialBalance  @relation(fields: [trialBalanceId], references: [id])
-//   createdAt       DateTime @default(now()) @map("date_created")
-//   updatedAt       DateTime? @updatedAt @map("date_modified")
-// }
+model TrialBalanceDetail {
+  id              String  @id @default(uuid()) @db.Char(36)
+  trialBalanceId  String  @db.Char(36)
+  isDebit         Boolean @default(true)
+  openingBalance  Decimal
+  closingBalance  Decimal
+  account         String
+  trialBalance    TrialBalance  @relation(fields: [trialBalanceId], references: [id])
+}
 
 model Ledger {
   id          String  @id @default(uuid()) @db.Char(36)
@@ -294,6 +296,8 @@ model Ledger {
   startWeekDay WeekDay // Enum: MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY
   accounts     Account[]
   // TrialBalance TrialBalance[]
+
+  TrialBalance TrialBalance[]
 }
 
 enum WeekDay {
@@ -363,6 +367,7 @@ enum AssetTypes {
     Current
     NonCurrent
 }
+
 model Asset {
   id                String  @id @default(uuid()) @db.Char(36)
   name              String  @map("nama_aset")
@@ -419,7 +424,6 @@ model AssetTags {
 
   @@unique([assetId, tagId])
 }
-
 
 model Position {
   id                  String  @id @default(uuid()) @db.Char(36)

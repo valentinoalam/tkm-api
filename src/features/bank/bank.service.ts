@@ -1,26 +1,63 @@
-import { Injectable } from '@nestjs/common';
-import { CreateBankDto } from './dto/create-bank.dto';
-import { UpdateBankDto } from './dto/update-bank.dto';
+import { Account } from './../ledger/components/accounts/entities/account.entity';
+import { ForbiddenException, Injectable } from '@nestjs/common';
+import { BankAccount } from './entities/bankAccount.entity';
+import { DatabaseService } from '@/core/database/database.service';
+import * as fakeData from 'src/shared/fake-data'; 
+import { CreateBankAccountDto, UpdateBankAccountDto } from './dto';
 
 @Injectable()
 export class BankService {
-  create(createBankDto: CreateBankDto) {
-    return 'This action adds a new bank';
+  constructor(private db: DatabaseService) {}
+
+  async createFakeData(): Promise<BankAccount> {
+    const fakebankAccount = fakeData.fakeBankAccount(); // Generate 10 fake users
+    const query = await this.db.$queryRaw`SELECT id FROM Account ORDER BY RAND() LIMIT 1`;
+    const { id } = query[0]
+    if (!id) throw new ForbiddenException('please create Account first.');
+    // Save the fake data to the database using Prisma
+    let bankAccount = await this.db.bankAccount.create({ 
+      data: {
+        ...fakebankAccount,
+        account: {
+          connect: {id} // Connect to an existing user
+        }
+      }, 
+    })
+    return bankAccount;
+  }
+  
+  async create(dto: CreateBankAccountDto): Promise<BankAccount> {
+    const {accountId, ...accData} = dto
+    return this.db.bankAccount.create({
+      data:{
+        ...accData,
+        account: {
+          connect: { id: dto.accountId }, // sets userId of Profile record
+        },
+      },
+    });
   }
 
-  findAll() {
-    return `This action returns all bank`;
+  async findAll(): Promise<BankAccount[]> {
+    return this.db.bankAccount.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} bank`;
+  async findOne(id: string): Promise<BankAccount | null> {
+    return this.db.bankAccount.findUnique({
+      where: { id },
+    });
   }
 
-  update(id: number, updateBankDto: UpdateBankDto) {
-    return `This action updates a #${id} bank`;
+  async update(id: string, data: UpdateBankAccountDto): Promise<BankAccount> {
+    return this.db.bankAccount.update({
+      where: { id },
+      data,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} bank`;
+  async remove(id: string): Promise<BankAccount> {
+    return this.db.bankAccount.delete({
+      where: { id },
+    });
   }
 }

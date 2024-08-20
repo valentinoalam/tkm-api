@@ -7,6 +7,27 @@ import { UpdateAssetDto } from './dto/update-asset.dto';
 export class AssetsController {
   constructor(private readonly assetsService: AssetsService) {}
 
+  @Get('fake')
+  async createFakeData() {
+    const dataOut = {
+      status: true,
+      message: '',
+      data: {
+        journal: null,
+      },
+      logs: {},
+    };
+    try {
+      const journal = await this.assetsService.createFakeData();
+      dataOut.data.journal = journal;
+    } catch (error) {
+      dataOut.status = false;
+      dataOut.message = error.message;
+      dataOut.logs = { ...dataOut.logs, error };
+    }
+    return dataOut;
+  }
+
   @Post()
   create(@Body() createAssetDto: CreateAssetDto) {
     return this.assetsService.create(createAssetDto);
@@ -19,16 +40,16 @@ export class AssetsController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.assetsService.findOne(+id);
+    return this.assetsService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateAssetDto: UpdateAssetDto) {
-    return this.assetsService.update(+id, updateAssetDto);
+    return this.assetsService.update(id, updateAssetDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.assetsService.remove(+id);
+    return this.assetsService.remove(id);
   }
 }

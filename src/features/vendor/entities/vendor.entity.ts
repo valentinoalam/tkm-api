@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-// import { JournalEntry } from '@/features/journal/components/entry/entities';
+import { Transaction } from '@/features/ledger/components/transactions/entities/transaction.entity';
 
 export class Vendor {
   @ApiProperty({
@@ -37,10 +37,10 @@ export class Vendor {
     nullable: true,
   })
   updatedAt: Date | null;
-  // @ApiProperty({
-  //   type: () => JournalEntry,
-  //   isArray: true,
-  //   required: false,
-  // })
-  // JournalEntry?: JournalEntry[];
+  @ApiProperty({
+    type: () => Transaction,
+    isArray: true,
+    required: false,
+  })
+  journalEntry?: Transaction[];
 }

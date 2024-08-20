@@ -1,5 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Profile } from './profile.entity';
+import { Profile } from '../components/profile/entities';
+import { UserNotification } from '../components/notifications/entities';
+import { Position } from '../components/position/entities';
+import { Participant } from '@/features/events/components/participants/entities';
 
 export class User {
   @ApiProperty({
@@ -45,4 +48,22 @@ export class User {
     nullable: true,
   })
   profile?: Profile | null;
+  @ApiProperty({
+    type: () => UserNotification,
+    isArray: true,
+    required: false,
+  })
+  userNotification?: UserNotification[];
+  @ApiProperty({
+    type: () => Position,
+    isArray: true,
+    required: false,
+  })
+  position?: Position[];
+  @ApiProperty({
+    type: () => Participant,
+    isArray: true,
+    required: false,
+  })
+  participant?: Participant[];
 }
