@@ -1,14 +1,35 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { ActivityService } from './activity.service';
-import { CreateActivityDto } from './dto/create-activity.dto';
-import { UpdateActivityDto } from './dto/update-activity.dto';
+import { CreateTransactionActivityDto } from './dto';
+import { UpdateTransactionActivityDto } from './dto';
 
 @Controller('activity')
 export class ActivityController {
   constructor(private readonly activityService: ActivityService) {}
 
+  @Get('fake')
+  async createFakeData() {
+    const dataOut = {
+      status: true,
+      message: '',
+      data: {
+        activity: null,
+      },
+      logs: {},
+    };
+    try {
+      const activity = await this.activityService.createFakeData();
+      dataOut.data.activity = activity;
+    } catch (error) {
+      dataOut.status = false;
+      dataOut.message = error.message;
+      dataOut.logs = { ...dataOut.logs, error };
+    }
+    return dataOut;
+  }
+  
   @Post()
-  create(@Body() createActivityDto: CreateActivityDto) {
+  create(@Body() createActivityDto: CreateTransactionActivityDto) {
     return this.activityService.create(createActivityDto);
   }
 
@@ -19,16 +40,16 @@ export class ActivityController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.activityService.findOne(+id);
+    return this.activityService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateActivityDto: UpdateActivityDto) {
-    return this.activityService.update(+id, updateActivityDto);
+  update(@Param('id') id: string, @Body() updateActivityDto: UpdateTransactionActivityDto) {
+    return this.activityService.update(id, updateActivityDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.activityService.remove(+id);
+    return this.activityService.remove(id);
   }
 }

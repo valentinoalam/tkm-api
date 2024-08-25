@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Account } from '../../account/entities/account.entity';
+import { Account } from '@/features/ledger/components/accounts/entities';
 
 export class BankAccount {
   @ApiProperty({

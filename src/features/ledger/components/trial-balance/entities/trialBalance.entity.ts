@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 import { Ledger } from '@/features/ledger/entities';
-import { TrialBalanceDetail } from '../trialBalanceDetail/entities';
+import { TrialBalanceDetail } from '../components/trialBalanceDetail/entities';
 
 export class TrialBalance {
   @ApiProperty({

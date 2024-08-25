@@ -28,56 +28,80 @@ generator client {
 //   provider = "node node_modules/prisma-docs-generator"
 //   output = "../docs"
 // }
-generator nestjsDto {
-  provider                        = "prisma-generator-nestjs-dto"
-  output                          = "./generated/dto"
-  outputToNestJsResourceStructure = "true"
-  flatResourceStructure           = "false"
-  exportRelationModifierClasses   = "true"
-  reExport                        = "true"
-  generateFileTypes               = "all"
-  createDtoPrefix                 = "Create"
-  updateDtoPrefix                 = "Update"
-  dtoSuffix                       = "Dto"
-  entityPrefix                    = ""
-  entitySuffix                    = ""
-  classValidation                 = "true"
-  fileNamingStyle                 = "camel"
-  noDependencies                  = "false"
-  outputType                      = "class"
-  definiteAssignmentAssertion     = "false"
-  requiredResponseApiProperty     = "true"
-  prettier                        = "true"
-  outputApiPropertyType           = "true"
-}
-generator zod {
-  provider = "zod-prisma"
-  output   = "./generated/zod" // (default) the directory where generated zod schemas will be saved
+// generator nestjsDto {
+//   provider                        = "prisma-generator-nestjs-dto"
+//   output                          = "./generated/dto"
+//   outputToNestJsResourceStructure = "true"
+//   flatResourceStructure           = "false"
+//   exportRelationModifierClasses   = "true"
+//   reExport                        = "true"
+//   generateFileTypes               = "all"
+//   createDtoPrefix                 = "Create"
+//   updateDtoPrefix                 = "Update"
+//   dtoSuffix                       = "Dto"
+//   entityPrefix                    = ""
+//   entitySuffix                    = ""
+//   classValidation                 = "true"
+//   fileNamingStyle                 = "camel"
+//   noDependencies                  = "false"
+//   outputType                      = "class"
+//   definiteAssignmentAssertion     = "false"
+//   requiredResponseApiProperty     = "true"
+//   prettier                        = "true"
+//   outputApiPropertyType           = "true"
+// }
+// generator zod {
+//   provider = "zod-prisma"
+//   output   = "./generated/zod" // (default) the directory where generated zod schemas will be saved
 
-  relationModel = true // (default) Create and export both plain and related models.
-  // relationModel         = "default" // Do not export model without relations.
-  // relationModel         = false // Do not generate related model
+//   relationModel = true // (default) Create and export both plain and related models.
+//   // relationModel         = "default" // Do not export model without relations.
+//   // relationModel         = false // Do not generate related model
 
-  modelCase = "PascalCase" // (default) Output models using pascal case (ex. UserModel, PostModel)
-  // modelCase             = "camelCase" // Output models using camel case (ex. userModel, postModel)
+//   modelCase = "PascalCase" // (default) Output models using pascal case (ex. UserModel, PostModel)
+//   // modelCase             = "camelCase" // Output models using camel case (ex. userModel, postModel)
 
-  modelSuffix = "Model" // (default) Suffix to apply to your prisma models when naming Zod schemas
+//   modelSuffix = "Model" // (default) Suffix to apply to your prisma models when naming Zod schemas
 
-  // useDecimalJs          = false // (default) represent the prisma Decimal type using as a JS number
-  useDecimalJs = true // represent the prisma Decimal type using Decimal.js (as Prisma does)
+//   // useDecimalJs          = false // (default) represent the prisma Decimal type using as a JS number
+//   useDecimalJs = true // represent the prisma Decimal type using Decimal.js (as Prisma does)
 
-  imports = null // (default) will import the referenced file in generated schemas to be used via imports.someExportedVariable
+//   imports = null // (default) will import the referenced file in generated schemas to be used via imports.someExportedVariable
 
-  // https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-by-null-values
-  prismaJsonNullability = true // (default) uses prisma's scheme for JSON field nullability
-  // prismaJsonNullability = false // allows null assignment to optional JSON fields
-}
+//   // https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-by-null-values
+//   prismaJsonNullability = true // (default) uses prisma's scheme for JSON field nullability
+//   // prismaJsonNullability = false // allows null assignment to optional JSON fields
+// }
 
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
+model AppsheetTransaksi {
+  id              String  @id @default(uuid()) @db.Char(36)
+  appSheetId      String  @unique
+  categoryId      String  @map("category_id") @db.Char(36)
+  index           Int 
+  timeStamp       DateTime? 
+  activity        String
+  in_out          TransactionType
+  value           Decimal
+  photoUrl        String?
+  dtTransaction   DateTime
+  dtCreated       DateTime           @default(now())
+  dtModified      DateTime? @updatedAt @map("date_modified")
+  category        AppsheetKategori @relation(fields: [categoryId], references: [id])
+}
+model AppsheetKategori {
+  id            String  @id @default(uuid()) @db.Char(36)
+  type          TransactionType
+  category      String    
+  dtCreated     DateTime  @default(now()) @map("date_created")
+  dtModified    DateTime? @updatedAt @map("date_modified")
+  transaksi AppsheetTransaksi[]
+  @@unique([type, category])
+}
 model Notification {
   id              String             @id @default(uuid()) @db.Char(36)
   sender          String?
@@ -168,7 +192,7 @@ model TransactionCategory {
 
 model TransactionActivity {
   id              String    @id @default(uuid()) @db.Char(36)
-  categoryId      String                @db.Char(36)
+  categoryId      String?                @db.Char(36)
   debitAccountId  String                @db.Char(36)
   creditAccountId String                @db.Char(36)
   name            String
@@ -236,8 +260,9 @@ model Account {
   parentAccountId     String? @db.Char(36)// For hierarchical accounts
   code                String
   name                String
-  type                AccountType
   description         String
+  type                AccountType
+  isDebit             Boolean
   startBalance        Decimal?
   currentBalance      Decimal?
   createdAt           DateTime  @default(now()) @map("date_created")

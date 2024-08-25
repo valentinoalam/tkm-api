@@ -33,7 +33,8 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "serve": "pm2 start ecosystem.config.js"
   },
   "dependencies": {
     "@brakebein/prisma-generator-nestjs-dto": "^1.23.0",
@@ -62,6 +63,7 @@
     "class-validator": "^0.14.1",
     "cookie-parser": "^1.4.6",
     "dataloader": "^2.2.2",
+    "dayjs": "^1.11.13",
     "google-auth-library": "^9.13.0",
     "google-spreadsheet": "^4.1.2",
     "googleapis": "^140.0.1",

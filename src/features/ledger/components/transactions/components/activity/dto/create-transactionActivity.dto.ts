@@ -1,12 +1,12 @@
 import { Category } from './../../category/entities/category.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateTransactionActivityDto {
   @ApiProperty({
     type: 'string',
   })
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   categoryId: string;
   @IsNotEmpty()

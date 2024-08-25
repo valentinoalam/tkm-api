@@ -13,13 +13,13 @@ export class AccountsController {
       status: true,
       message: '',
       data: {
-        journal: null,
+        account: null,
       },
       logs: {},
     };
     try {
-      const journal = await this.accountsService.createFakeData();
-      dataOut.data.journal = journal;
+      const account = await this.accountsService.createFakeData();
+      dataOut.data.account = account;
     } catch (error) {
       dataOut.status = false;
       dataOut.message = error.message;

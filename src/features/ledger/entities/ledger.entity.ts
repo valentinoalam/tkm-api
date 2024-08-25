@@ -1,7 +1,7 @@
 import { Period, WeekDay } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 import { Account } from '../components/accounts/entities';
-import { TrialBalance } from '../components/trialBalance/entities';
+import { TrialBalance } from '../components/trial-balance/entities';
 export class Ledger {
   @ApiProperty({
     type: 'string',

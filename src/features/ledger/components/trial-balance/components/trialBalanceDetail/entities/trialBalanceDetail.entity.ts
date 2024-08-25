@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
-import { TrialBalance } from '../../entities';
+import { TrialBalance } from '../../../entities';
 
 export class TrialBalanceDetail {
   @ApiProperty({

@@ -11,17 +11,24 @@ export class AccountsService {
   
   async createFakeData(): Promise<Account> {
     const fakeAccount = fakeData.fakeAccount(); // Generate 10 fake users
-
+    const isDebit = ['Asset', 'Expense'].includes(fakeAccount.type)
     // Save the fake data to the database using Prisma
     let account = await this.db.account.create({ 
-      data: fakeAccount 
+      data: {
+        ...fakeAccount,
+        isDebit
+        } 
     })
     return account;
   }
 
   async create(dto: CreateAccountDto): Promise<Account> {
+    const isDebit = ['Asset', 'Expense'].includes(dto.type)
     return this.db.account.create({
-      data:{ ...dto},
+      data:{ 
+        ...dto,
+        isDebit
+      },
     });
   }
 

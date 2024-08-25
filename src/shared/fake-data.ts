@@ -104,9 +104,6 @@ export function fakeTransactionCategoryComplete() {
 }
 export function fakeTransactionActivity() {
   return {
-    categoryId: faker.string.uuid(),
-    debitAccountId: faker.string.uuid(),
-    creditAccountId: faker.string.uuid(),
     name: faker.person.fullName(),
   };
 }

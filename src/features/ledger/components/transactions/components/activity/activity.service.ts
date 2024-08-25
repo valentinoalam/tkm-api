@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Account } from '@/features/ledger/components/accounts/entities';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import * as fakeData from 'src/shared/fake-data'; 
 import { TransactionActivity } from './entities';
 import { CreateTransactionActivityDto, UpdateTransactionActivityDto } from './dto';
@@ -9,9 +10,32 @@ export class ActivityService {
   constructor(private db: DatabaseService) {}
   async createFakeData(): Promise<TransactionActivity> {
     const fakeEntry = fakeData.fakeTransactionActivity(); // Generate 10 fake users
-    // Save the fake data to the database using Prisma
+    const debitQuery = await this.db.$queryRaw`
+      SELECT id
+      FROM Account
+      WHERE isDebit = true
+      ORDER BY RAND()
+      LIMIT 1;
+      `;
+      
+    const debitAccountId = debitQuery[0].id;
+    
+    const creditQuery = await this.db.$queryRaw`
+      SELECT id
+      FROM Account
+      WHERE isDebit = false
+      ORDER BY RAND()
+      LIMIT 1;
+      `;
+    
+    const creditAccountId = creditQuery[0].id;
+    if (!debitAccountId || !creditAccountId) throw new ForbiddenException('please provide account debit first.');
     let entry = await this.db.transactionActivity.create({ 
-      data: { ...fakeEntry }, 
+      data: { 
+        ...fakeEntry,
+        debitAccountId,
+        creditAccountId
+      }, 
       
     })
     return entry;

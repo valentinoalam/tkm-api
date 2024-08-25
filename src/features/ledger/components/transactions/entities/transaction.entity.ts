@@ -1,9 +1,9 @@
 import { Prisma, TransactionType } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
-import { TransactionActivity } from '../../transactionActivity/entities/transactionActivity.entity';
-import { Vendor } from '../../vendor/entities/vendor.entity';
-import { Media } from '../../media/entities/media.entity';
-import { Program } from '../../program/entities/program.entity';
+import { TransactionActivity } from '../components/activity/entities';
+import { Vendor } from '@/features/vendor/entities';
+import { Media } from '@/features/media/entities';
+import { Program } from '../../programs/entities';
 
 export class Transaction {
   @ApiProperty({
