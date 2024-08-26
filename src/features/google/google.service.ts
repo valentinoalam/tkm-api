@@ -13,8 +13,8 @@ export class GoogleService {
   private client: any; // Placeholder for the authenticated client
 
   async authenticate(): Promise<void> {
-    const secretPath = path.resolve(__dirname, 'client_secret.json');
-    console.log(secretPath)
+    const secretPath =  path.resolve(__dirname, 'client_secret.json');
+    console.warn("psyh " + secretPath)
     const keys = JSON.parse(fs.readFileSync(secretPath, 'utf8'));
     const SCOPES = [
         'https://www.googleapis.com/auth/spreadsheets',
