@@ -4,7 +4,7 @@ import { google } from 'googleapis';
 import { GoogleAuth } from 'google-auth-library';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 import * as fs from 'fs';
-import { join } from 'path';
+import path, { join } from 'path';
 import { DatabaseService } from '@/core/database/database.service';
 
 @Injectable()
@@ -13,7 +13,9 @@ export class GoogleService {
   private client: any; // Placeholder for the authenticated client
 
   async authenticate(): Promise<void> {
-    const keys = JSON.parse(fs.readFileSync('client_secret.json', 'utf8'));
+    const secretPath = path.resolve(__dirname, 'client_secret.json');
+    console.log(secretPath)
+    const keys = JSON.parse(fs.readFileSync(secretPath, 'utf8'));
     const SCOPES = [
         'https://www.googleapis.com/auth/spreadsheets',
         'https://www.googleapis.com/auth/drive.file',
