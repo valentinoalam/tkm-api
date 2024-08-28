@@ -151,7 +151,6 @@ export class GoogleService {
           // categoryId: categoryExists.id,
           timeStamp: rectimeStamp ? this.parseDate(rectimeStamp) : null,
           activity: row.get('deskripsi'),
-          in_out: transactionType,
           value: row.get('nilai'),
           category:{
             connect: {
