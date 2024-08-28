@@ -6,6 +6,26 @@ import * as dayjs from 'dayjs';
 export class DariAppsheetService {
   constructor(private db: DatabaseService) {}
 
+  async showAllNotaImage() {
+    return this.db.appsheetPhoto.findMany({
+      include: {
+        transaksi: {
+          select:{
+            id: true,
+            dtTransaction: true,
+            activity: true,
+            value: true,
+            category: {
+              select:{
+                category: true,
+                type: true
+              }
+            },
+          }
+        }
+      }
+    });
+  }
 
   async findAllTransactions(dateStart?: string, dateEnd?: string) {
     const filters: any = {};
@@ -24,6 +44,7 @@ export class DariAppsheetService {
           category: {
             select: {
               category: true, // Include the category name
+              type: true
             },
           },
           photo: {
@@ -39,6 +60,8 @@ export class DariAppsheetService {
           category: {
             select: {
               category: true, // Include the category name
+              type: true
+
             },
           },
           photo: {
@@ -48,8 +71,8 @@ export class DariAppsheetService {
           }
         },
       });
-    const transactionData = await data.map(({dtTransaction, activity, category, in_out, value, photo}) => ({
-      dtTransaction: dayjs(dtTransaction).format('DD MMM'), year: dayjs(dtTransaction).year(), activity, category: category.category, in_out, value, thumbnailLink: photo? photo.thumbnailLink : null
+    const transactionData = await data.map(({dtTransaction, activity, category, value, photo}) => ({
+      dtTransaction: dayjs(dtTransaction).format('DD MMM'), year: dayjs(dtTransaction).year(), activity, category: category.category, in_out: category.type, value, thumbnailLink: photo? photo.thumbnailLink : null
     }))
     return transactionData;
   }

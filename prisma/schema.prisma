@@ -84,7 +84,7 @@ model AppsheetPhoto {
   name            String  @unique
   thumbnailLink   String
 
-  AppsheetTransaksi AppsheetTransaksi?
+  transaksi       AppsheetTransaksi?
 }
 model AppsheetTransaksi {
   id              String  @id @default(uuid()) @db.Char(36)
@@ -94,7 +94,6 @@ model AppsheetTransaksi {
   index           Int 
   timeStamp       DateTime? 
   activity        String
-  in_out          TransactionType
   value           Decimal
   photo           AppsheetPhoto? @relation(fields: [photoId], references: [id])
 

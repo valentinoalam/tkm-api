@@ -18,6 +18,10 @@ export class DariAppsheetController {
     return this.dariAppsheetService.findAllCategories();
   }
 
+  @Get('gallery')
+  showAllNotaImage() {
+    return this.dariAppsheetService.showAllNotaImage();
+  }
   @Get('transactions/:id')
   findOneTransaction(@Param('id') id: string) {
     return this.dariAppsheetService.findOneTransaction(id);

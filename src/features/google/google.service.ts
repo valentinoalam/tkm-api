@@ -131,7 +131,6 @@ export class GoogleService {
           // categoryId: categoryExists.id,
           timeStamp: rectimeStamp ? this.parseDate(rectimeStamp) : null,
           activity: row.get('deskripsi'),
-          in_out: transactionType,
           value: row.get('nilai'),
           category:{
             connect: {
@@ -166,10 +165,10 @@ export class GoogleService {
   console.log('Valid transactions:', validTransactions);
     try {
       const result = await Promise.all(validTransactions.map(async transaction => {
-        const {appSheetId, dtTransaction, category, timeStamp, activity, in_out, value, photo} = transaction
+        const {appSheetId, dtTransaction, category, timeStamp, activity, value, photo} = transaction
         await this.db.appsheetTransaksi.upsert({
           where: { appSheetId },
-          update: { dtTransaction, category, timeStamp, activity, in_out, value, photo },
+          update: { dtTransaction, category, timeStamp, activity, value, photo },
           create: transaction,
         });
       }));

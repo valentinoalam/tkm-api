@@ -28,7 +28,7 @@ async function bootstrap() {
     swaggerDoc.serve();
   }
 
-  // app.setGlobalPrefix('api');
+  app.setGlobalPrefix('api');
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true, // Jika ingin diblock data selain data di dto harus dirubah whitelist = true

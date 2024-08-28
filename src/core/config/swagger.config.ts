@@ -41,7 +41,7 @@ export default class SwaggerDocumentation {
       },
       // customCssUrl: '../swagger/swagger.css',
       // customfavIcon: '../swagger/favicon.png',
-      customSiteTitle: 'DSN - Weighbridge Management System',
+      customSiteTitle: 'Masjid Management System',
     });
   }
 }
