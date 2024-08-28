@@ -78,25 +78,37 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model AppsheetPhoto {
+  id              String  @id @default(uuid()) @db.Char(36)
+  transaksiId     String? @unique
+  name            String  @unique
+  thumbnailLink   String
+
+  AppsheetTransaksi AppsheetTransaksi?
+}
 model AppsheetTransaksi {
   id              String  @id @default(uuid()) @db.Char(36)
   appSheetId      String  @unique
   categoryId      String  @map("category_id") @db.Char(36)
+  photoId         String? @unique
   index           Int 
   timeStamp       DateTime? 
   activity        String
   in_out          TransactionType
   value           Decimal
-  photoUrl        String?
+  photo           AppsheetPhoto? @relation(fields: [photoId], references: [id])
+
   dtTransaction   DateTime
   dtCreated       DateTime           @default(now())
   dtModified      DateTime? @updatedAt @map("date_modified")
   category        AppsheetKategori @relation(fields: [categoryId], references: [id])
 }
+
 model AppsheetKategori {
   id            String  @id @default(uuid()) @db.Char(36)
   type          TransactionType
   category      String    
+  color         String?
   dtCreated     DateTime  @default(now()) @map("date_created")
   dtModified    DateTime? @updatedAt @map("date_modified")
   transaksi AppsheetTransaksi[]

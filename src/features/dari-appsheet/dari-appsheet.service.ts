@@ -7,18 +7,49 @@ export class DariAppsheetService {
   constructor(private db: DatabaseService) {}
 
 
-  async findAllTransactions() {
-    const data = await this.db.appsheetTransaksi.findMany({
-      include: {
-        category: {
-          select: {
-            category: true, // Include the category name
+  async findAllTransactions(dateStart?: string, dateEnd?: string) {
+    const filters: any = {};
+    let data= []
+    if (dateStart) {
+      filters.gte = new Date(dateStart);
+    }
+    if (dateEnd) {
+      filters.lte = new Date(dateEnd);
+    }
+    const whereClause = dateStart || dateEnd ? { dtTransaction: filters } : {};
+    if (whereClause) {
+      data = await this.db.appsheetTransaksi.findMany({
+        where: whereClause,
+        include: {
+          category: {
+            select: {
+              category: true, // Include the category name
+            },
           },
-        }
-      },
-    });
-    const transactionData = await data.map(({dtTransaction, activity, category, in_out, value, photoUrl}) => ({
-      dtTransaction: dayjs(dtTransaction).format('DD/MM/YYYY'), activity, category: category.category, in_out, value, photoUrl
+          photo: {
+            select: {
+              thumbnailLink: true
+            }
+          }
+        },
+      });
+    } else 
+      data = await this.db.appsheetTransaksi.findMany({
+        include: {
+          category: {
+            select: {
+              category: true, // Include the category name
+            },
+          },
+          photo: {
+            select: {
+              thumbnailLink: true
+            }
+          }
+        },
+      });
+    const transactionData = await data.map(({dtTransaction, activity, category, in_out, value, photo}) => ({
+      dtTransaction: dayjs(dtTransaction).format('DD MMM'), year: dayjs(dtTransaction).year(), activity, category: category.category, in_out, value, thumbnailLink: photo? photo.thumbnailLink : null
     }))
     return transactionData;
   }

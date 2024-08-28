@@ -1,14 +1,16 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, HttpException, HttpStatus, Inject, Param, Res } from '@nestjs/common';
 import { GoogleService } from './google.service';
 import { drive_v3 } from 'googleapis';
-
+import { Response } from 'express';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
+import { PassThrough } from 'stream';
 @Controller('google')
 export class GoogleController {
-  constructor(private readonly googleService: GoogleService) {}
+  constructor(private readonly googleService: GoogleService, @Inject(CACHE_MANAGER) private cacheManager: Cache) {}
 
   @Get('drive')
   async getDriveApi() {
-    await this.googleService.authenticate(); // Ensure authentication
+    //await this.googleService.authenticate(); // Ensure authentication
     const drive = await this.googleService.getDriveApi();
     // https://docs.google.com/spreadsheets/d/1uNwEa_HMegXTBq67QzqGjD6udMwkeqjX8C4I-oZhBS0/edit?usp=drive_link
     //categori:https://docs.google.com/spreadsheets/d/1uNwEa_HMegXTBq67QzqGjD6udMwkeqjX8C4I-oZhBS0/edit?usp=sharing
@@ -39,76 +41,97 @@ export class GoogleController {
     // Use the 'drive' API instance to make API calls
   }
 
-  @Get('/:spreadsheetId/:range')
-  async getSpreadsheetData(@Param('spreadsheetId') spreadsheetId: string, @Param('range') range: string) {
-    await this.googleService.authenticate();
-    const data = await this.googleService.getSpreadsheetData(spreadsheetId, range);
-    return data;
-  }
-  @Get('itiqaf-sheet')
-  async getMastersheetData() {
-    await this.googleService.authenticate();
-    const sheet = await this.googleService.getMastersheetData();
-    const rows = await sheet.getRows()
-    const participants = rows.filter((row)=>row.get('Nama Lengkap')).map((row, i) => ({ id: i, name: row.get('Nama Lengkap'), sex: row.get('Jenis Kelamin') }));
-    return participants;
-  }
+  // @Get('/:spreadsheetId/:range')
+  // async getSpreadsheetData(@Param('spreadsheetId') spreadsheetId: string, @Param('range') range: string) {
+  //   //await this.googleService.authenticate();
+  //   const data = await this.googleService.getSpreadsheetData(spreadsheetId, range);
+  //   return data;
+  // }
+  // @Get('itiqaf-sheet')
+  // async getMastersheetData() {
+  //   //await this.googleService.authenticate();
+  //   const sheet = await this.googleService.getMastersheetData();
+  //   const rows = await sheet.getRows()
+  //   const participants = rows.filter((row)=>row.get('Nama Lengkap')).map((row, i) => ({ id: i, name: row.get('Nama Lengkap'), sex: row.get('Jenis Kelamin') }));
+  //   return participants;
+  // }
 
   @Get('foto-nota')
   async getFotoNotaData() {
-    await this.googleService.authenticate(); // Ensure authentication
+    //await this.googleService.authenticate(); // Ensure authentication
 
     const drive = await this.googleService.getDriveApi(); // Assume this method returns the Drive API client
-    const folderId = '1UMqhmCsA5fSmU8euwKjcCPjJfBqM4pjm'; // Replace with your actual folder ID
-    let files, nextPageToken;
+    const gallery = await this.googleService.getFotoNotaData(drive);
 
-    try {
-      const res = await drive.files.list({
-        pageSize: 1000,
-        pageToken: nextPageToken,
-        q: `'${folderId}' in parents AND mimeType contains 'image/'`, // Search for image files within the folder
-        fields: 'nextPageToken, files(id, name, mimeType)',
-      });
-
-      files = res.data.files;
-
-      if (!files || files.length === 0) {
-        console.log('No image files found in the folder.');
-        return []; // Return empty array if no images found
-      }
-
-      // Extract image URLs from the retrieved files
-      // const imageUrls = files.map(file => ({
-      //   name: file.name,
-      //   url: `https://drive.google.com/uc?export=view&id=${file.id}`, // Assuming public access
-      // }));
-      console.log('Files:');
-      files.map((file) => {
-          console.log(`${file.name} (${file.id})`);
-      });
-      nextPageToken = res.data.nextPageToken;
-      if(nextPageToken) console.log(nextPageToken)
-      return files;
-    } catch (error) {
-      console.error('Error fetching foto-nota data:', error);
-      throw new Error('Failed to fetch image data from Google Drive'); // Custom error message
-    }
+    return gallery;
+    
   }
 
   @Get('kas-kecil')
   async getKasKecilData() {
-    await this.googleService.authenticate();
+    //await this.googleService.authenticate();
     const jurnal = await this.googleService.getKasKecilData();
 
     return jurnal;
   }
   @Get('kategori-entry')
   async syncKasKecilKategori() {
-    await this.googleService.authenticate();
+    //await this.googleService.authenticate();
     const categories = await this.googleService.syncKasKecilKategori();
 
     return categories;
     
   }
   
+  @Get('image/:fileId')
+  async getImage(@Param('fileId') fileId: string, @Res() res: Response) {
+    // const cacheKey = 'key';
+    // const cachedImage = await this.cacheManager.get(cacheKey);
+
+    // if (cachedImage) {
+    //   console.log("myamya")
+    //   const cachedStream = new PassThrough();
+    //   cachedStream.end(cachedImage);
+    //   res.setHeader('Content-Type', 'image/jpeg');
+    //   return cachedStream.pipe(res); // Return the cached image
+    // }
+
+    try {
+      //await this.googleService.authenticate();
+      const drive = await this.googleService.getDriveApi(); 
+      const fileStream = await this.googleService.getPhotoDetail(drive, fileId);
+      res.setHeader('Content-Type', 'image/jpeg');
+      fileStream.pipe(res);
+      // // Cache the image stream
+      // this.cacheManager.set(cacheKey, file, 600);
+      // const chunks = [];
+      // fileStream.on('data', chunk => {
+      //   chunks.push(chunk);
+      // });
+
+      // fileStream.on('end', async () => {
+      //   const buffer = Buffer.concat(chunks);
+      //   try {
+      //     await this.cacheManager.set(cacheKey, buffer, 600);
+      //     console.log("Cached image successfully");
+      //   } catch (cacheError) {
+      //     console.error('Failed to cache image:', cacheError);
+      //   }
+      //   const stream = new PassThrough();
+      //   stream.end(buffer);
+      //   res.setHeader('Content-Type', 'image/jpeg');
+      //   stream.pipe(res);
+      // });
+
+      // fileStream.on('error', error => {
+      //   console.error('Error streaming file:', error);
+      //   res.status(500).send('Error streaming file');
+      // });
+
+    } catch (error) {
+      console.error(error);
+      throw new HttpException('Failed to fetch file', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
 }

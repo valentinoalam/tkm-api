@@ -1,6 +1,6 @@
 import { MiddlewareConsumer, Module, NestModule, OnModuleInit } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { CacheModule } from '@nestjs/cache-manager';
+import { CacheModule, CacheStoreFactory } from '@nestjs/cache-manager';
 import { ScheduleModule } from '@nestjs/schedule';
 import { DatabaseModule } from '../core/database/database.module';
 import { join } from 'path';
@@ -11,16 +11,17 @@ import { HealthModule } from './health/health.module';
 import { ConfigModule } from '@nestjs/config';
 import configuration from '@core/config/configuration';
 import { ConfigValidator } from '@/core/config/validator/config.validator';
-import { EventEmitterModule } from '@nestjs/event-emitter';
-import { BroadcastService } from '@feat/sse/broadcast.service';
-import { SseService } from '@feat/sse/sse.service';
+// import { EventEmitterModule } from '@nestjs/event-emitter';
+// import { BroadcastService } from '@feat/sse/broadcast.service';
+// import { SseService } from '@feat/sse/sse.service';
 
-import { SseController } from '@feat/sse/sse.controller';
+// import { SseController } from '@feat/sse/sse.controller';
 import { utilities as nestWinstonModuleUtilities, WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
 import { LoggedMiddleware } from '@common/middlewares/logged.middleware';
 import { FeaturesModule } from '@/features/features.module';
-
+import redisStore from 'cache-manager-redis-store';
+// import type { RedisClientOptions } from 'redis';
 // import { appConfigValidationSchema } from '@core/config/config.schema';
 
 @Module({
@@ -69,7 +70,13 @@ import { FeaturesModule } from '@/features/features.module';
     //   ignoreErrors: false,
     // }),
     // ScheduleModule.forRoot(),
-    // CacheModule.register({ isGlobal: true }),
+    CacheModule.register({
+      isGlobal: true,
+      redisStore,
+      host: 'localhost',
+      port: 6379,
+      ttl: 600,
+    }),
     // ServeStaticModule.forRoot({
     //   rootPath: join(__dirname, '..', 'upload'),
     //   serveRoot: '/img/',

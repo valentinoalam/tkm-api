@@ -2471,10 +2471,10 @@ cache-manager-redis-store@^3.0.1:
   dependencies:
     redis "^4.3.1"
 
-cache-manager@^5.7.5:
-  version "5.7.5"
-  resolved "https://registry.yarnpkg.com/cache-manager/-/cache-manager-5.7.5.tgz#b06a1b2c27578d8c375768a107c5cbbc6ce2554e"
-  integrity sha512-mBMVq5rw33a7ZdxrpDEo0BY9W7UTmbD+t2jgkofuLDqssGG+kUVaKugq2WQiINZWxMJJ9LAXtJIYLtdEThmqQw==
+cache-manager@^5.7.6:
+  version "5.7.6"
+  resolved "https://registry.yarnpkg.com/cache-manager/-/cache-manager-5.7.6.tgz#bdd8a154c73e5233824aa09ceb359ed225d37b7e"
+  integrity sha512-wBxnBHjDxF1RXpHCBD6HGvKER003Ts7IIm0CHpggliHzN1RZditb7rXoduE1rplc2DEFYKxhLKgFuchXMJje9w==
   dependencies:
     eventemitter3 "^5.0.1"
     lodash.clonedeep "^4.5.0"
@@ -6648,6 +6648,11 @@ randombytes@^2.1.0:
   dependencies:
     safe-buffer "^5.1.0"
 
+randomcolor@^0.6.2:
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/randomcolor/-/randomcolor-0.6.2.tgz#7a57362ae1a1278439aeed2c15e5deb8ea33f56d"
+  integrity sha512-Mn6TbyYpFgwFuQ8KJKqf3bqqY9O1y37/0jgSK/61PUxV4QfIMv0+K2ioq8DfOjkBslcjwSzRfIDEXfzA9aCx7A==
+
 range-parser@~1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/range-parser/-/range-parser-1.2.1.tgz#3cf37023d199e1c24d1a55b84800c2f3e6468031"
@@ -6731,7 +6736,7 @@ redent@^3.0.0:
     indent-string "^4.0.0"
     strip-indent "^3.0.0"
 
-redis@^4.3.1:
+redis@^4.3.1, redis@^4.7.0:
   version "4.7.0"
   resolved "https://registry.yarnpkg.com/redis/-/redis-4.7.0.tgz#b401787514d25dd0cfc22406d767937ba3be55d6"
   integrity sha512-zvmkHEAdGMn+hMRXuMBtu4Vo5P6rHQjLoHftu+lBqq8ZTA3RCVC/WzD790bkKKiNFp7d5/9PcSD19fJyyRvOdQ==

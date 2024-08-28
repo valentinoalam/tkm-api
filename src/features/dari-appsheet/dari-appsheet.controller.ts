@@ -1,15 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { DariAppsheetService } from './dari-appsheet.service';
-import { CreateDariAppsheetDto } from './dto/create-dari-appsheet.dto';
-import { UpdateDariAppsheetDto } from './dto/update-dari-appsheet.dto';
 
 @Controller('dari-appsheet')
 export class DariAppsheetController {
   constructor(private readonly dariAppsheetService: DariAppsheetService) {}
 
   @Get('transactions')
-  findAllTransactions() {
-    return this.dariAppsheetService.findAllTransactions();
+  findAllTransactions( 
+    @Query('dateStart') dateStart?: string,
+    @Query('dateEnd') dateEnd?: string
+  ) {
+    return this.dariAppsheetService.findAllTransactions(dateStart, dateEnd);
   }
 
   @Get('categories')
