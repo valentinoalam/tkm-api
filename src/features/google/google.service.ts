@@ -208,6 +208,7 @@ export class GoogleService {
     const sheet = doc.sheetsByTitle['kategori']
     await sheet.loadHeaderRow(1);
     const rows = await sheet.getRows({limit: 500})
+    let n = 0;
     const categories = await Promise.all(rows.filter((row)=>row.get('id')).map(async(row) => { 
       const id = row.get('id');
       const category = row.get('kategori');
@@ -216,27 +217,32 @@ export class GoogleService {
         luminosity: 'bright', // Adjust luminosity as needed
         format: 'hex',
       });
+      console.log(randomColorHex)
       let dataExists = await this.db.appsheetKategori.findUnique({
         where:  { id }
       });
       if (dataExists) {
-        if(dataExists.category !== category)
+        if(dataExists.category !== category) {
           await this.db.appsheetKategori.update({
             where: { id }, // Unique identifier for the upsert
-            data: { category, color: dataExists.color? dataExists.color : randomColorHex }
+            data: { category, color: dataExists.color? dataExists.color : randomColorHex[0] }
           });
-        if(!dataExists.color)
+          n++;
+        }
+        if(!dataExists.color){
           await this.db.appsheetKategori.update({
             where: { id }, // Unique identifier for the upsert
-            data: { color: randomColorHex }
+            data: { color: randomColorHex[0] }
           });
+          n++;
+        }
         return null; // Skip this entry or handle it as needed
       }
       return {
         id, 
         type: row.get('tipe'), 
         category,
-        color: randomColorHex
+        color: randomColorHex[0]
       }
     }));
     const validCategories = categories.filter(transaction => transaction !== null)
@@ -246,7 +252,7 @@ export class GoogleService {
         data: validCategories,
         skipDuplicates: true,
       });
-
+      console.log(`Categories in the database successfully updated: { count: ${n} }`);
       console.log('Categories successfully added to the database:', result);
     } catch (error) {
       console.error('Error adding categories to the database:', error);
