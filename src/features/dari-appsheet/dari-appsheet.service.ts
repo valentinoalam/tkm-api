@@ -29,7 +29,6 @@ export class DariAppsheetService {
 
   async findAllTransactions(dateStart?: string, dateEnd?: string) {
     const filters: any = {};
-    let data= []
     if (dateStart) {
       filters.gte = new Date(dateStart);
     }
@@ -37,40 +36,24 @@ export class DariAppsheetService {
       filters.lte = new Date(dateEnd);
     }
     const whereClause = dateStart || dateEnd ? { dtTransaction: filters } : {};
-    if (whereClause) {
-      data = await this.db.appsheetTransaksi.findMany({
-        where: whereClause,
-        include: {
-          category: {
-            select: {
-              category: true, // Include the category name
-              type: true
-            },
+    const data = await this.db.appsheetTransaksi.findMany({
+      where: whereClause,
+      include: {
+        category: {
+          select: {
+            category: true, // Include the category name
+            type: true,
+            color: true
           },
-          photo: {
-            select: {
-              thumbnailLink: true
-            }
-          }
         },
-      });
-    } else 
-      data = await this.db.appsheetTransaksi.findMany({
-        include: {
-          category: {
-            select: {
-              category: true, // Include the category name
-              type: true,
-              color: true
-            },
-          },
-          photo: {
-            select: {
-              thumbnailLink: true
-            }
+        photo: {
+          select: {
+            thumbnailLink: true
           }
-        },
-      });
+        }
+      },
+    });
+    
     const transactionData = await data.map(({dtTransaction, activity, category, value, photo}) => ({
       dtTransaction: dayjs(dtTransaction).format('DD MMM'), year: dayjs(dtTransaction).year(), activity, category: category.category, color: category.color, in_out: category.type, value, thumbnailLink: photo? photo.thumbnailLink : null
     }))
