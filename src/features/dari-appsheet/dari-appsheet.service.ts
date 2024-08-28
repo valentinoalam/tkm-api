@@ -60,8 +60,8 @@ export class DariAppsheetService {
           category: {
             select: {
               category: true, // Include the category name
-              type: true
-
+              type: true,
+              color: true
             },
           },
           photo: {
@@ -72,7 +72,7 @@ export class DariAppsheetService {
         },
       });
     const transactionData = await data.map(({dtTransaction, activity, category, value, photo}) => ({
-      dtTransaction: dayjs(dtTransaction).format('DD MMM'), year: dayjs(dtTransaction).year(), activity, category: category.category, in_out: category.type, value, thumbnailLink: photo? photo.thumbnailLink : null
+      dtTransaction: dayjs(dtTransaction).format('DD MMM'), year: dayjs(dtTransaction).year(), activity, category: category.category, color: category.color, in_out: category.type, value, thumbnailLink: photo? photo.thumbnailLink : null
     }))
     return transactionData;
   }
