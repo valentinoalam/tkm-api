@@ -225,6 +225,11 @@ export class GoogleService {
             where: { id }, // Unique identifier for the upsert
             data: { category, color: dataExists.color? dataExists.color : randomColorHex }
           });
+        if(!dataExists.color)
+          await this.db.appsheetKategori.update({
+            where: { id }, // Unique identifier for the upsert
+            data: { color: randomColorHex }
+          });
         return null; // Skip this entry or handle it as needed
       }
       return {
