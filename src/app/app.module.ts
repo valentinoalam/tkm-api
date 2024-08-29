@@ -1,6 +1,5 @@
 import { MiddlewareConsumer, Module, NestModule, OnModuleInit } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { CacheModule, CacheStoreFactory } from '@nestjs/cache-manager';
 import { ScheduleModule } from '@nestjs/schedule';
 import { DatabaseModule } from '../core/database/database.module';
 import { join } from 'path';
