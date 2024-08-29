@@ -1,4 +1,118 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateDariAppsheetDto } from './create-dari-appsheet.dto';
+import { Prisma, TransactionType } from '@prisma/client';
+import { ApiProperty } from '@nestjs/swagger';
+import {
+    IsDateString,
+    IsDecimal,
+    IsInt,
+    IsOptional,
+    IsString,
+  } from 'class-validator';
+export class UpdateAppsheetTransaksiDto {
+    @ApiProperty({
+      type: 'string',
+      required: false,
+    })
+    @IsOptional()
+    @IsString()
+    appSheetId?: string;
+    @ApiProperty({
+      type: 'integer',
+      format: 'int32',
+      required: false,
+    })
+    @IsOptional()
+    @IsInt()
+    index?: number;
+    @ApiProperty({
+      type: 'string',
+      format: 'date-time',
+      required: false,
+      nullable: true,
+    })
+    @IsOptional()
+    @IsDateString()
+    timeStamp?: Date | null;
+    @ApiProperty({
+      type: 'string',
+      required: false,
+    })
+    @IsOptional()
+    @IsString()
+    activity?: string;
+    @ApiProperty({
+      type: 'number',
+      format: 'double',
+      required: false,
+    })
+    @IsOptional()
+    @IsDecimal()
+    value?: Prisma.Decimal;
+    @ApiProperty({
+      type: 'string',
+      format: 'date-time',
+      required: false,
+    })
+    @IsOptional()
+    @IsDateString()
+    dtTransaction?: Date;
+  }
+  
 
-export class UpdateDariAppsheetDto extends PartialType(CreateDariAppsheetDto) {}
+  export class UpdateAppsheetKategoriDto {
+    @ApiProperty({
+      enum: TransactionType,
+      required: false,
+    })
+    @IsOptional()
+    type?: TransactionType;
+    @ApiProperty({
+      type: 'string',
+      required: false,
+    })
+    @IsOptional()
+    @IsString()
+    category?: string;
+    @ApiProperty({
+      type: 'string',
+      required: false,
+      nullable: true,
+    })
+    @IsOptional()
+    @IsString()
+    color?: string | null;
+  }
+  
+  export class UpdateAppsheetPhotoDto {
+    @ApiProperty({
+      type: 'string',
+      required: false,
+    })
+    @IsOptional()
+    @IsString()
+    name?: string;
+    @ApiProperty({
+      type: 'string',
+      required: false,
+      nullable: true,
+    })
+    @IsOptional()
+    @IsString()
+    thumbnailLink?: string | null;
+    @ApiProperty({
+      type: 'string',
+      required: false,
+      nullable: true,
+    })
+    @IsOptional()
+    @IsString()
+    imageLink?: string | null;
+    @ApiProperty({
+      type: 'string',
+      required: false,
+      nullable: true,
+    })
+    @IsOptional()
+    @IsString()
+    downloadLink?: string | null;
+  }
+  

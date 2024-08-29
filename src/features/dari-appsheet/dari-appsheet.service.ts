@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '@/core/database/database.service';
-import * as dayjs from 'dayjs';
-
+import { UpdateAppsheetKategoriDto, UpdateAppsheetPhotoDto, UpdateAppsheetTransaksiDto } from './dto/update-dari-appsheet.dto';
+import { CreateAppsheetKategoriDto, CreateAppsheetTransaksiDto } from './dto/create-dari-appsheet.dto';
 @Injectable()
 export class DariAppsheetService {
   constructor(private db: DatabaseService) {}
@@ -23,7 +23,12 @@ export class DariAppsheetService {
             },
           }
         }
-      }
+      },
+      orderBy: {
+        transaksi: {
+          dtTransaction: 'desc',
+        }
+      },
     });
   }
 
@@ -48,14 +53,18 @@ export class DariAppsheetService {
         },
         photo: {
           select: {
-            thumbnailLink: true
+            name: true,
+            downloadLink: true
           }
         }
+      },
+      orderBy: {
+        dtTransaction: 'desc',
       },
     });
     
     const transactionData = await data.map(({dtTransaction, activity, category, value, photo}) => ({
-      dtTransaction: dayjs(dtTransaction).format('DD MMM'), year: dayjs(dtTransaction).year(), activity, category: category.category, color: category.color, in_out: category.type, value, thumbnailLink: photo? photo.thumbnailLink : null
+      dtTransaction, activity, category: category.category, color: category.color, in_out: category.type, value, photo: photo? photo.name : null, downloadLink: photo? photo.downloadLink : null
     }))
     return transactionData;
   }
@@ -73,16 +82,63 @@ export class DariAppsheetService {
       where: { id },
     });
   }
-  // async update(id: string, data: UpdateappsheetTransaksiDto) {
-  //   return this.db.appsheetTransaksi.update({
-  //     where: { id },
-  //     data,
-  //   });
-  // }
+  async createTransaksi(data: CreateAppsheetTransaksiDto) {
+    const {categoryId, photoId, ...rest} = data;
 
-  async remove(id: string) {
+    return await this.db.appsheetTransaksi.create({
+      data:{
+        ...rest,
+        category: {
+          connect: {
+            id: categoryId
+          }
+        },
+        photo: {
+          connect: {
+            id: photoId? photoId : null
+          }
+        }
+      }
+    });
+  }
+
+  async createKategori(data: CreateAppsheetKategoriDto) {
+    return await this.db.appsheetKategori.create({
+      data
+    });
+  }
+
+  async updateTransaksi(id: string, data: UpdateAppsheetTransaksiDto) {
+    return this.db.appsheetTransaksi.update({
+      where: { id },
+      data,
+    });
+  }
+
+  async updateKategori(id: string, data: UpdateAppsheetKategoriDto) {
+    return this.db.appsheetKategori.update({
+      where: { id },
+      data,
+    });
+  }
+
+  async updatePhotoData(id: string, data: UpdateAppsheetPhotoDto) {
+    return this.db.appsheetPhoto.update({
+      where: { id },
+      data,
+    });
+  }
+
+  async batalkanTransaksi(id: string) {
     return this.db.appsheetTransaksi.delete({
       where: { id },
     });
   }
+
+  async removeKategori(id: string) {
+    return this.db.appsheetTransaksi.delete({
+      where: { id },
+    });
+  }
+
 }

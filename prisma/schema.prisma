@@ -28,6 +28,7 @@ generator client {
 //   provider = "node node_modules/prisma-docs-generator"
 //   output = "../docs"
 // }
+
 // generator nestjsDto {
 //   provider                        = "prisma-generator-nestjs-dto"
 //   output                          = "./generated/dto"
@@ -50,6 +51,7 @@ generator client {
 //   prettier                        = "true"
 //   outputApiPropertyType           = "true"
 // }
+
 // generator zod {
 //   provider = "zod-prisma"
 //   output   = "./generated/zod" // (default) the directory where generated zod schemas will be saved
@@ -76,7 +78,7 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
-  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+  // shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 model AppsheetPhoto {
   id              String  @id @default(uuid()) @db.Char(36)
@@ -88,7 +90,7 @@ model AppsheetPhoto {
 }
 model AppsheetTransaksi {
   id              String  @id @default(uuid()) @db.Char(36)
-  appSheetId      String  @unique
+  appSheetId      String?  @unique
   categoryId      String  @map("category_id") @db.Char(36)
   photoId         String? @unique
   index           Int 
