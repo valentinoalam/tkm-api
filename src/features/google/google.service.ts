@@ -307,21 +307,22 @@ export class GoogleService {
           const filePath = resolve(destinationFolder, file.name);
           const thumbnailPath = resolve(destinationFolder + '/small/', file.name);
 
-          // Check if the file already exists
-          if (fs.existsSync(filePath)) {
-            this.logger.info({ message: `Image already exists: ${file.name}, skipping download.` });
-            continue; // Skip saving the image if it already exists
-          }
-
           try {
-            // Download the image from the thumbnailLink
-            const fullSizeLink = file.thumbnailLink.replace(/=s220/g, '');
-            const response = await axios.get(fullSizeLink, { responseType: 'arraybuffer' });
-            const response2 = await axios.get(file.thumbnailLink, { responseType: 'arraybuffer' });
+            
+            
 
-            // Save the file locally
-            fs.writeFileSync(filePath, response.data);
-            fs.writeFileSync(thumbnailPath, response2.data);
+            // Check if the file already exists
+            if (!fs.existsSync(filePath)) {
+              
+              // Download the image from the thumbnailLink
+              const fullSizeLink = file.thumbnailLink.replace(/=s220/g, '');
+              const response = await axios.get(fullSizeLink, { responseType: 'arraybuffer' });
+              const response2 = await axios.get(file.thumbnailLink, { responseType: 'arraybuffer' });
+              // Save the file locally
+              fs.writeFileSync(filePath, response.data);
+              fs.writeFileSync(thumbnailPath, response2.data);
+            } else this.logger.info({ message: `Image already exists: ${file.name}, skipping download.` });
+            
             const imageLink = `${this.serveRoot}${file.name}`;
             const thumbnailLink = `${this.serveRoot}small/${file.name}`;
             const result = await this.db.appsheetPhoto.upsert({
