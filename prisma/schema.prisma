@@ -76,14 +76,14 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
-  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+  // shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 model AppsheetPhoto {
   id              String  @id @default(uuid()) @db.Char(36)
-  transaksiId     String? @unique
   name            String  @unique
   thumbnailLink   String
-
+  imageLink       String?
+  downloadLink    String?
   transaksi       AppsheetTransaksi?
 }
 model AppsheetTransaksi {

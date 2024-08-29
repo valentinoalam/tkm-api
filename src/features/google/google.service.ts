@@ -1,26 +1,28 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { google } from 'googleapis';
 import { GoogleAuth } from 'google-auth-library';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 import * as fs from 'fs';
-import { join } from 'path';
+import path, { resolve } from 'path';
 import { DatabaseService } from '@/core/database/database.service';
 import { randomColor } from 'randomcolor';
-import { Readable } from 'stream';
-import { connect } from 'http2';
-import { response, Response } from 'express';
-
+import axios from 'axios';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 @Injectable()
 export class GoogleService {
   private client: any; 
-  constructor(private db: DatabaseService) {}
+  private readonly serveRoot = '/img/';
+  constructor(
+    private db: DatabaseService, 
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger) {}
 
   async onModuleInit(): Promise<void> {
     await this.authenticate(); // Authenticate during module initialization
   }
 
   private async authenticate(): Promise<void> {
-    const keys = JSON.parse(fs.readFileSync('client_secret2.json', 'utf8'));
+    const keys = JSON.parse(fs.readFileSync('client_secret.json', 'utf8'));
     const SCOPES = [
         'https://www.googleapis.com/auth/spreadsheets',
         'https://www.googleapis.com/auth/drive.file',
@@ -314,5 +316,79 @@ export class GoogleService {
         console.error(error);
         throw error; // Re-throw for handling in the calling code
     }
-}
+  }
+
+  async saveImagesFromDrive(drive) {
+    const destinationFolder = resolve(process.cwd(), '..', 'images'); // Store in the 'public/images' directory
+    const folderId = '1UMqhmCsA5fSmU8euwKjcCPjJfBqM4pjm'; // Replace with your actual folder ID
+    let nextPageToken = null, updatedImage = [];
+    // Ensure the destination folder exists
+    if (!fs.existsSync(destinationFolder)) {
+      fs.mkdirSync(destinationFolder, { recursive: true });
+    }
+
+    do {
+      const res = await drive.files.list({
+        pageSize: 1000,
+        pageToken: nextPageToken,
+        q: `'${folderId}' in parents AND mimeType contains 'image/'`,
+        fields: 'nextPageToken, files(id, name, mimeType, thumbnailLink, webContentLink)',
+      });
+
+      const files = res.data.files;
+      if (!files.length) {
+        this.logger.info({ message: 'No image files found in the folder.' });
+        return;
+      }
+
+      for (const file of files) {
+        if (file.thumbnailLink) {
+          const filePath = resolve(destinationFolder, file.name);
+          const thumbnailPath = resolve(destinationFolder + '/small/', file.name);
+
+          // Check if the file already exists
+          // if (fs.existsSync(filePath)) {
+          //   this.logger.info({ message: `Image already exists: ${file.name}, skipping download.` });
+          //   continue; // Skip saving the image if it already exists
+          // }
+
+          try {
+            // Download the image from the thumbnailLink
+            // const fullSizeLink = file.thumbnailLink.replace(/=s220/g, '');
+            // const response = await axios.get(fullSizeLink, { responseType: 'arraybuffer' });
+            // const response2 = await axios.get(file.thumbnailLink, { responseType: 'arraybuffer' });
+
+            // Save the file locally
+            // fs.writeFileSync(filePath, response.data);
+            // fs.writeFileSync(thumbnailPath, response2.data);
+            const imageLink = `${this.serveRoot}${file.name}`;
+            const thumbnailLink = `${this.serveRoot}small/${file.name}`;
+            const result = await this.db.appsheetPhoto.upsert({
+              where: {
+                name: file.name
+              },
+              update: {
+                thumbnailLink,
+                imageLink
+              },
+              create: {
+                id: file.id,
+                name: file.name,
+                thumbnailLink,
+                imageLink,
+
+              }
+            });
+            this.logger.info({ message: `Saved image: ${file.name} to ${filePath}. Accessible at: ${imageLink}` });
+            updatedImage.push(result);
+          } catch (error) {
+            this.logger.error({ message: `Failed to save image: ${file.name}`, error: error.message });
+          }
+        }
+      }
+
+      nextPageToken = res.data.nextPageToken;
+    } while (nextPageToken);
+    return updatedImage;
+  }
 }

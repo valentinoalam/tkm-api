@@ -9,11 +9,15 @@ export class GoogleController {
   async getFotoNotaData() {
     const drive = await this.googleService.getDriveApi(); // Assume this method returns the Drive API client
     const gallery = await this.googleService.getFotoNotaData(drive);
-
-    return gallery;
-    
+    return gallery; 
   }
-
+  @Get('save-foto')
+  async saveFotoNota() {
+    const drive = await this.googleService.getDriveApi(); // Assume this method returns the Drive API client
+    const gallery = await this.googleService.saveImagesFromDrive(drive);
+    return gallery; 
+  }
+  
   @Get('kas-kecil')
   async getKasKecilData() {
     const jurnal = await this.googleService.getKasKecilData();

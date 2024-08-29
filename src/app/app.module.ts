@@ -30,6 +30,7 @@ import { FeaturesModule } from '@/features/features.module';
         new winston.transports.Console({
           format: winston.format.combine(
             winston.format.timestamp(),
+            winston.format.colorize(),
             winston.format.ms(),
             nestWinstonModuleUtilities.format.nestLike('MyApp', {
               colors: true,
@@ -43,11 +44,10 @@ import { FeaturesModule } from '@/features/features.module';
     //   // other options
     }),
     // ScheduleModule.forRoot(),
-
-    // ServeStaticModule.forRoot({
-    //   rootPath: join(__dirname, '..', 'upload'),
-    //   serveRoot: '/img/',
-    // }),
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), '..', 'images'),
+      serveRoot: '/img/',
+    }),
     //   inject: [AppConfigService],
     //   imports: [AppConfigModule],
     // }),
