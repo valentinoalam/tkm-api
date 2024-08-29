@@ -264,45 +264,6 @@ export class GoogleService {
     return validCategories;
   }
 
-  async getFotoNotaData(drive): Promise<[]> {
-    const folderId = '1UMqhmCsA5fSmU8euwKjcCPjJfBqM4pjm'; // Replace with your actual folder ID
-    let files, nextPageToken;
-
-    try {
-      const res = await drive.files.list({
-        pageSize: 1000,
-        pageToken: nextPageToken,
-        q: `'${folderId}' in parents AND mimeType contains 'image/'`, // Search for image files within the folder
-        fields: 'nextPageToken, files(id, name, mimeType, thumbnailLink)',
-      });
-
-      files = res.data.files.map(file => ({
-        id: file.id,
-        name: file.name,
-        thumbnailLink: file.thumbnailLink,
-      }));
-
-      if (!files || files.length === 0) {
-        console.log('No image files found in the folder.');
-        return []; // Return empty array if no images found
-      }
-
-      nextPageToken = res.data.nextPageToken;
-      if(nextPageToken) console.log(nextPageToken)
-
-      const result = await this.db.appsheetPhoto.createMany({
-        data: files,
-        skipDuplicates: true,
-      });
-
-      console.log('Gallery successfully added to the database:', result);
-      return files;
-    } catch (error) {
-      console.error('Error fetching foto-nota data:', error);
-      throw new Error('Failed to fetch image data from Google Drive'); // Custom error message
-    }
-  }
-
   async getPhotoDetail (drive, fileId){
     try {
       const downloadResponse = await drive.files.get(
@@ -318,7 +279,7 @@ export class GoogleService {
     }
   }
 
-  async saveImagesFromDrive(drive) {
+  async getUpdateFotoNota(drive): Promise<any[]> {
     const destinationFolder = resolve(process.cwd(), '..', 'images'); // Store in the 'public/images' directory
     const folderId = '1UMqhmCsA5fSmU8euwKjcCPjJfBqM4pjm'; // Replace with your actual folder ID
     let nextPageToken = null, updatedImage = [];
@@ -347,20 +308,20 @@ export class GoogleService {
           const thumbnailPath = resolve(destinationFolder + '/small/', file.name);
 
           // Check if the file already exists
-          // if (fs.existsSync(filePath)) {
-          //   this.logger.info({ message: `Image already exists: ${file.name}, skipping download.` });
-          //   continue; // Skip saving the image if it already exists
-          // }
+          if (fs.existsSync(filePath)) {
+            this.logger.info({ message: `Image already exists: ${file.name}, skipping download.` });
+            continue; // Skip saving the image if it already exists
+          }
 
           try {
             // Download the image from the thumbnailLink
-            // const fullSizeLink = file.thumbnailLink.replace(/=s220/g, '');
-            // const response = await axios.get(fullSizeLink, { responseType: 'arraybuffer' });
-            // const response2 = await axios.get(file.thumbnailLink, { responseType: 'arraybuffer' });
+            const fullSizeLink = file.thumbnailLink.replace(/=s220/g, '');
+            const response = await axios.get(fullSizeLink, { responseType: 'arraybuffer' });
+            const response2 = await axios.get(file.thumbnailLink, { responseType: 'arraybuffer' });
 
             // Save the file locally
-            // fs.writeFileSync(filePath, response.data);
-            // fs.writeFileSync(thumbnailPath, response2.data);
+            fs.writeFileSync(filePath, response.data);
+            fs.writeFileSync(thumbnailPath, response2.data);
             const imageLink = `${this.serveRoot}${file.name}`;
             const thumbnailLink = `${this.serveRoot}small/${file.name}`;
             const result = await this.db.appsheetPhoto.upsert({
@@ -369,14 +330,15 @@ export class GoogleService {
               },
               update: {
                 thumbnailLink,
-                imageLink
+                imageLink,
+                downloadLink: file.webContentLink
               },
               create: {
                 id: file.id,
                 name: file.name,
                 thumbnailLink,
                 imageLink,
-
+                downloadLink: file.webContentLink
               }
             });
             this.logger.info({ message: `Saved image: ${file.name} to ${filePath}. Accessible at: ${imageLink}` });

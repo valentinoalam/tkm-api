@@ -8,13 +8,7 @@ export class GoogleController {
   @Get('foto-nota')
   async getFotoNotaData() {
     const drive = await this.googleService.getDriveApi(); // Assume this method returns the Drive API client
-    const gallery = await this.googleService.getFotoNotaData(drive);
-    return gallery; 
-  }
-  @Get('save-foto')
-  async saveFotoNota() {
-    const drive = await this.googleService.getDriveApi(); // Assume this method returns the Drive API client
-    const gallery = await this.googleService.saveImagesFromDrive(drive);
+    const gallery = await this.googleService.getUpdateFotoNota(drive);
     return gallery; 
   }
   
