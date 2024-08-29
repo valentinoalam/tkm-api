@@ -48,9 +48,6 @@ export class CreateAppsheetTransaksiDto {
     @IsNotEmpty()
     @IsString()
     categoryId: string;
-    @IsOptional()
-    @IsString()
-    photoId?: string;
 }
   
 export class CreateAppsheetPhotoDto {

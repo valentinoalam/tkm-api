@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '@/core/database/database.service';
 import { UpdateAppsheetKategoriDto, UpdateAppsheetPhotoDto, UpdateAppsheetTransaksiDto } from './dto/update-dari-appsheet.dto';
 import { CreateAppsheetKategoriDto, CreateAppsheetTransaksiDto } from './dto/create-dari-appsheet.dto';
+import path from 'path';
 @Injectable()
 export class DariAppsheetService {
   constructor(private db: DatabaseService) {}
@@ -82,11 +83,20 @@ export class DariAppsheetService {
       where: { id },
     });
   }
-  async createTransaksi(data: CreateAppsheetTransaksiDto) {
-    const {categoryId, photoId, ...rest} = data;
-
-    return await this.db.appsheetTransaksi.create({
-      data:{
+  
+  async createTransaksi(data: CreateAppsheetTransaksiDto, file: Express.Multer.File = null) {
+    const {categoryId, ...rest} = data;
+    let transaksi;
+   
+    if (file) {
+      const originalFilePath = file.path;
+      const thumbnailFilePath = path.join(path.dirname(originalFilePath), 'small/' + file.filename);
+      // Process the image to create a thumbnail
+      const sharp = require('sharp');
+      await sharp(originalFilePath)
+        .resize(200) // Resize to a width of 200px while maintaining aspect ratio
+        .toFile(thumbnailFilePath);
+      transaksi = {
         ...rest,
         category: {
           connect: {
@@ -94,12 +104,25 @@ export class DariAppsheetService {
           }
         },
         photo: {
-          connect: {
-            id: photoId? photoId : null
+          create: {
+            name: file.filename,
+            thumbnailLink: thumbnailFilePath,
+            imageLink: originalFilePath,
+            downloadLink: null
           }
         }
       }
-    });
+    } else {
+      transaksi = {
+        ...rest,
+        category: {
+          connect: {
+            id: categoryId
+          }
+        },
+      }
+    }
+    return await this.db.appsheetTransaksi.create({ data: transaksi });
   }
 
   async createKategori(data: CreateAppsheetKategoriDto) {
@@ -108,10 +131,33 @@ export class DariAppsheetService {
     });
   }
 
-  async updateTransaksi(id: string, data: UpdateAppsheetTransaksiDto) {
+  async updateTransaksi(id: string, data: UpdateAppsheetTransaksiDto, file: Express.Multer.File) {
+    let transaksi;
+    if (file) {
+      const originalFilePath = file.path;
+      const thumbnailFilePath = path.join(path.dirname(originalFilePath), 'small/' + file.filename);
+      // Process the image to create a thumbnail
+      const sharp = require('sharp');
+      await sharp(originalFilePath)
+        .resize(200) // Resize to a width of 200px while maintaining aspect ratio
+        .toFile(thumbnailFilePath);
+      transaksi = {
+        ...data,
+        photo: {
+          create: {
+            name: file.filename,
+            imageLink: thumbnailFilePath,
+            thumbnailLink: originalFilePath
+          },
+        },
+      }
+    } else {
+      transaksi = data
+    }
+    
     return this.db.appsheetTransaksi.update({
       where: { id },
-      data,
+      data: transaksi,
     });
   }
 
