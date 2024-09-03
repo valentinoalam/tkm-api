@@ -42,6 +42,8 @@ export class DariAppsheetService {
       filters.lte = new Date(dateEnd);
     }
     const whereClause = dateStart || dateEnd ? { dtTransaction: filters } : {};
+    console.log(whereClause)
+    console.log('filter = ' + filters)
     const data = await this.db.appsheetTransaksi.findMany({
       where: whereClause,
       include: {

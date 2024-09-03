@@ -10,22 +10,6 @@ import {
 } from 'class-validator';
 export class CreateAppsheetTransaksiDto {
     @ApiProperty({
-      type: 'integer',
-      format: 'int32',
-    })
-    @IsNotEmpty()
-    @IsInt()
-    index: number;
-    @ApiProperty({
-      type: 'string',
-      format: 'date-time',
-      required: false,
-      nullable: true,
-    })
-    @IsOptional()
-    @IsDateString()
-    timeStamp?: Date | null;
-    @ApiProperty({
       type: 'string',
     })
     @IsNotEmpty()
