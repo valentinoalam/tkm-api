@@ -9,6 +9,7 @@ import { randomColor } from 'randomcolor';
 import axios from 'axios';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
+import { Cron } from '@nestjs/schedule';
 @Injectable()
 export class GoogleService {
   private client: any; 
@@ -61,17 +62,12 @@ export class GoogleService {
   //   });
   //   return res.data.values;
   // }
-  // async getMastersheetData() {
-  //   const doc = new GoogleSpreadsheet('1TwbZ-D_mIXKguA0avPWhj8ngQtC6AsUHekFpbAZh9k8', this.getClient());
-  //   await doc.loadInfo();
-  //   const sheet = doc.sheetsByTitle['Master Data']
-  //   await sheet.loadHeaderRow(5);
-  //   return sheet
-  // }
-
+  @Cron('30 15 * * *')
   async getKasKecilData() {
     const doc = new GoogleSpreadsheet('1uNwEa_HMegXTBq67QzqGjD6udMwkeqjX8C4I-oZhBS0', this.getClient());
     await doc.loadInfo();
+    await this.syncKasKecilKategori(doc);
+
     const sheet = doc.sheetsByTitle['jurnal']
     await sheet.loadHeaderRow(1);
     // const headers = sheet.headerValues;
@@ -87,15 +83,9 @@ export class GoogleService {
       const appSheetId = row.get('id'); 
 
       if (!appSheetId) {
-          console.error(`Missing appSheetId at row ${i + 1}`);
           return null; // Skip this entry or handle it as needed
       }
-      // let dataExists = await this.db.appsheetTransaksi.findUnique({
-      //   where:  { id: appSheetId }
-      // });
-      // if (dataExists) {
-      //   return null; // Skip this entry or handle it as needed
-      // }
+
       const categoryId = row.get('kategori');
       const transactionType = row.get('masuk_keluar');
       const photoName =  row.get('foto');
@@ -119,15 +109,14 @@ export class GoogleService {
           console.log(categoryId)
           console.error(`Invalid categoryId at row ${i + 1}`);
           return null; // Skip this transaction if categoryId is invalid
-      }
-      console.log(photoName)
+      } 
+
       if(photoName != undefined) {
         photoExists = await this.db.appsheetPhoto.findUnique({
           where:  { name: photoName.split('/')[1] }
         });
         console.log(photoExists.id)
         return {
-          index: i + 1,
           dtTransaction: tglPenerimaan ? this.parseDate(tglPenerimaan) : null,
           appSheetId: appSheetId,
           // categoryId: categoryExists.id,
@@ -204,9 +193,7 @@ export class GoogleService {
     }
   }
 
-  async syncKasKecilKategori() {
-    const doc = new GoogleSpreadsheet('1uNwEa_HMegXTBq67QzqGjD6udMwkeqjX8C4I-oZhBS0', this.getClient());
-    await doc.loadInfo();
+  async syncKasKecilKategori(doc: { loadInfo: () => any; sheetsByTitle: { [x: string]: any; }; }) {
     const sheet = doc.sheetsByTitle['kategori']
     await sheet.loadHeaderRow(1);
     const rows = await sheet.getRows({limit: 500})
@@ -308,9 +295,6 @@ export class GoogleService {
           const thumbnailPath = resolve(destinationFolder + '/small/', file.name);
 
           try {
-            
-            
-
             // Check if the file already exists
             if (!fs.existsSync(filePath)) {
               

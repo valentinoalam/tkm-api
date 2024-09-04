@@ -41,9 +41,8 @@ export class DariAppsheetService {
     if (dateEnd) {
       filters.lte = new Date(dateEnd);
     }
-    const whereClause = dateStart || dateEnd ? { dtTransaction: filters } : {};
-    console.log(whereClause)
-    console.log('filter = ' + filters)
+    const whereClause = dateStart || dateEnd ? { dtTransaction: filters, isDeleted: false } : {isDeleted: false};
+
     const data = await this.db.appsheetTransaksi.findMany({
       where: whereClause,
       include: {
@@ -184,8 +183,11 @@ export class DariAppsheetService {
   }
 
   async removeKategori(id: string) {
-    return this.db.appsheetTransaksi.delete({
+    return this.db.appsheetTransaksi.update({
       where: { id },
+      data: {
+        isDeleted: true
+      }
     });
   }
 
