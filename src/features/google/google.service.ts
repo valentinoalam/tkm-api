@@ -51,23 +51,18 @@ export class GoogleService {
     return google.drive({ version: 'v3', auth: this.getClient() });
   }
 
-  // async getSpreadsheetData(spreadsheetId: string, range: string) {
-  //   console.log(this.getClient())
-  //   const sheets = google.sheets({ version: 'v4', auth: this.getClient() });
-  //   console.log(sheets)
-  //   const res = await sheets.spreadsheets.values.get({
-  //     spreadsheetId:'1TwbZ-D_mIXKguA0avPWhj8ngQtC6AsUHekFpbAZh9k8',
-  //     range,   
-
-  //   });
-  //   return res.data.values;
-  // }
-  @Cron('30 15 * * *')
-  async getKasKecilData() {
+  async getDocument() {
     const doc = new GoogleSpreadsheet('1uNwEa_HMegXTBq67QzqGjD6udMwkeqjX8C4I-oZhBS0', this.getClient());
     await doc.loadInfo();
-    await this.syncKasKecilKategori(doc);
+    return doc
+  }
 
+
+  @Cron('30 1 * * *')
+  async getKasKecilData() {
+    const doc = await this.getDocument();
+    const kategori = await this.syncKasKecilKategori(doc);
+    const photo = await this.getUpdateFotoNota();
     const sheet = doc.sheetsByTitle['jurnal']
     await sheet.loadHeaderRow(1);
     // const headers = sheet.headerValues;
@@ -170,7 +165,7 @@ export class GoogleService {
       throw new Error('Failed to add transactions to the database');
     }
   
-    return validTransactions;
+    return [kategori, photo, validTransactions];
   }
 
   parseDate(dateString) {
@@ -266,7 +261,8 @@ export class GoogleService {
     }
   }
 
-  async getUpdateFotoNota(drive): Promise<any[]> {
+  async getUpdateFotoNota(): Promise<any[]> {
+    const drive = await this.getDriveApi(); // Assume this method returns the Drive API client
     const destinationFolder = resolve(process.cwd(), '..', 'images'); // Store in the 'public/images' directory
     const folderId = '1UMqhmCsA5fSmU8euwKjcCPjJfBqM4pjm'; // Replace with your actual folder ID
     let nextPageToken = null, updatedImage = [];
@@ -338,4 +334,16 @@ export class GoogleService {
     } while (nextPageToken);
     return updatedImage;
   }
+
+    // async getSpreadsheetData(spreadsheetId: string, range: string) {
+  //   console.log(this.getClient())
+  //   const sheets = google.sheets({ version: 'v4', auth: this.getClient() });
+  //   console.log(sheets)
+  //   const res = await sheets.spreadsheets.values.get({
+  //     spreadsheetId:'1TwbZ-D_mIXKguA0avPWhj8ngQtC6AsUHekFpbAZh9k8',
+  //     range,   
+
+  //   });
+  //   return res.data.values;
+  // }
 }

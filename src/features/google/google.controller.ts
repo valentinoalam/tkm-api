@@ -7,24 +7,15 @@ export class GoogleController {
 
   @Get('foto-nota')
   async getFotoNotaData() {
-
+    const gallery = await this.googleService.getUpdateFotoNota();
     return gallery; 
   }
   
   @Get('kas-kecil')
   async getKasKecilData() {
-    const drive = await this.googleService.getDriveApi(); // Assume this method returns the Drive API client
-    const gallery = await this.googleService.getUpdateFotoNota(drive);
-    const jurnal = await this.googleService.getKasKecilData();
+    const [kategori, photo, jurnal] = await this.googleService.getKasKecilData();
 
     return jurnal;
-  }
-  @Get('kategori-entry')
-  async syncKasKecilKategori() {
-    const categories = await this.googleService.syncKasKecilKategori();
-
-    return categories;
-    
   }
   
   @Get('image/:fileId')
