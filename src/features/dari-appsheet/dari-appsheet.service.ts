@@ -66,8 +66,8 @@ export class DariAppsheetService {
       },
     });
     
-    const transactionData = await data.map(({dtTransaction, activity, category, value, photo}) => ({
-      dtTransaction, activity, category: category.category, color: category.color, in_out: category.type, value, photo: photo? photo.name : null, downloadLink: photo? photo.downloadLink : null
+    const transactionData = await data.map(({id, dtTransaction, activity, category, value, photo}) => ({
+      id, dtTransaction, activity, category: category.category, color: category.color, in_out: category.type, value, photo: photo? photo.name : null, downloadLink: photo? photo.downloadLink : null
     }))
     return transactionData;
   }
