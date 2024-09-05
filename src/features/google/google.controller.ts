@@ -1,6 +1,8 @@
 import { Controller, Get, HttpException, HttpStatus, Param, Res } from '@nestjs/common';
 import { GoogleService } from './google.service';
 import { Response } from 'express';
+import { ResponseSuccess, ResponseError } from '@/common/response/response';
+import { DataResponse } from '@/common/response/data-response.interface';
 @Controller('google')
 export class GoogleController {
   constructor(private readonly googleService: GoogleService) {}
@@ -12,10 +14,22 @@ export class GoogleController {
   }
   
   @Get('kas-kecil')
-  async getKasKecilData() {
-    const [kategori, photo, jurnal] = await this.googleService.getKasKecilData();
-
-    return jurnal;
+  async getKasKecilData(@Res() res) {
+    const dataOut: DataResponse<any>[] = [];
+    try {
+      const data = await this.googleService.getKasKecilData();
+      data.forEach(item => {
+        // Create a DataItemResponse for each item
+        dataOut.push({
+          records: item,
+          totalRecords: item.length,
+          page: 0, // or calculate based on your pagination logic
+        });
+      }); 
+      return res.status(HttpStatus.OK).json(new ResponseSuccess('Items retrieved successfully', dataOut));
+    } catch (error) {
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(new ResponseError('Failed to retrieve items', error));
+    }
   }
   
   @Get('image/:fileId')

@@ -10,11 +10,18 @@ export class DariAppsheetController {
   constructor(private readonly dariAppsheetService: DariAppsheetService) {}
 
   @Get('transactions')
+  getTransactionsDataChart() {
+    return this.dariAppsheetService.getTransactionsDataChart();
+  }
+
+  @Get('transactions')
   findAllTransactions( 
     @Query('startDate') dateStart?: string,
-    @Query('endDate') dateEnd?: string
+    @Query('endDate') dateEnd?: string,
+    @Query('endDate') page?: number, 
+    @Query('endDate') limit?: number
   ) {
-    return this.dariAppsheetService.findAllTransactions(dateStart, dateEnd);
+    return this.dariAppsheetService.findAllTransactions(dateStart, dateEnd, page, limit);
   }
 
   @Get('categories')

@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Query } from '@nestjs/common';
 import { DatabaseService } from '@/core/database/database.service';
 import { UpdateAppsheetKategoriDto, UpdateAppsheetPhotoDto, UpdateAppsheetTransaksiDto } from './dto/update-dari-appsheet.dto';
 import { CreateAppsheetKategoriDto, CreateAppsheetTransaksiDto } from './dto/create-dari-appsheet.dto';
 import path from 'path';
+import { getPaginatedData } from '@/shared/helper';
 @Injectable()
 export class DariAppsheetService {
+
   constructor(private db: DatabaseService) {}
 
   async showAllNotaImage() {
@@ -33,7 +35,29 @@ export class DariAppsheetService {
     });
   }
 
-  async findAllTransactions(dateStart?: string, dateEnd?: string) {
+  async getTransactionsDataChart() {
+    const data = await this.db.appsheetTransaksi.findMany({
+      where: { isDeleted: false },
+      include: {
+        category: {
+          select: {
+            category: true, // Include the category name
+            type: true,
+            color: true
+          },
+        },
+      },
+      orderBy: {
+        dtTransaction: 'desc',
+      },
+    });
+    
+    const transactionData = await data.map(({dtTransaction, category, value}) => ({
+      dtTransaction, category: category.category, color: category.color, in_out: category.type, value,
+    }))
+    return transactionData;
+  }
+  async findAllTransactions(dateStart?: string, dateEnd?: string, page?: number, limit?: number) {
     const filters: any = {};
     if (dateStart) {
       filters.gte = new Date(dateStart);
@@ -42,8 +66,7 @@ export class DariAppsheetService {
       filters.lte = new Date(dateEnd);
     }
     const whereClause = dateStart || dateEnd ? { dtTransaction: filters, isDeleted: false } : {isDeleted: false};
-
-    const data = await this.db.appsheetTransaksi.findMany({
+    const query = {
       where: whereClause,
       include: {
         category: {
@@ -63,12 +86,14 @@ export class DariAppsheetService {
       orderBy: {
         dtTransaction: 'desc',
       },
-    });
+    }
     
-    const transactionData = await data.map(({id, dtTransaction, activity, category, value, photo}) => ({
+    const data = await getPaginatedData(this.db, 'appsheetTransaksi', query, page, limit);
+    
+    data.data = await data.data.map(({id, dtTransaction, activity, category, value, photo}) => ({
       id, dtTransaction, activity, category: category.category, color: category.color, in_out: category.type, value, photo: photo? photo.name : null, downloadLink: photo? photo.downloadLink : null
     }))
-    return transactionData;
+    return data;
   }
 
   async findAllCategories() {

@@ -27,7 +27,7 @@ async function bootstrap() {
     const swaggerDoc = new SwaggerDocumentation(app);
     swaggerDoc.serve();
   }
-
+  app.use(cookieParser());
   app.setGlobalPrefix('api');
   app.useGlobalPipes(
     new ValidationPipe({

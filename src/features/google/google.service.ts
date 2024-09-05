@@ -60,6 +60,7 @@ export class GoogleService {
 
   @Cron('30 1 * * *')
   async getKasKecilData() {
+    const messages: string[] = [];
     const doc = await this.getDocument();
     const kategori = await this.syncKasKecilKategori(doc);
     const photo = await this.getUpdateFotoNota();
@@ -131,10 +132,8 @@ export class GoogleService {
         };
       }
       return {
-          index: i + 1,
           dtTransaction: tglPenerimaan ? this.parseDate(tglPenerimaan) : null,
           appSheetId: appSheetId,
-          // categoryId: categoryExists.id,
           timeStamp: rectimeStamp ? this.parseDate(rectimeStamp) : null,
           activity: row.get('deskripsi'),
           value: row.get('nilai'),
@@ -144,10 +143,9 @@ export class GoogleService {
             }
           }
       };
-  }));
+    }));
 
-  const validTransactions = transactions.filter(transaction => transaction !== null);
-  console.log('Valid transactions:', validTransactions);
+    const validTransactions = transactions.filter(transaction => transaction !== null);
     try {
       const result = await Promise.all(validTransactions.map(async transaction => {
         const {appSheetId, dtTransaction, category, timeStamp, activity, value, photo} = transaction
@@ -158,7 +156,7 @@ export class GoogleService {
         });
       }));
 
-      console.log('Transactions successfully upserted in the database:', result);
+      messages.push(`Transactions successfully upserted in the database: ${result}`);
     } catch (error) {
       console.error('Error upserting transactions:', error.message);
       console.error('Full error:', error);
