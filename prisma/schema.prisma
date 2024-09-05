@@ -78,7 +78,7 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
-  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+  // shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 model AppsheetPhoto {
   id              String  @id @default(uuid()) @db.Char(36)
@@ -95,7 +95,7 @@ model AppsheetTransaksi {
   photoId         String? @unique
   timeStamp       DateTime? 
   activity        String
-  value           Decimal @map("amount")
+  value           Decimal? @map("amount")
 
   isDeleted       Boolean @default(false)
   dtTransaction   DateTime
