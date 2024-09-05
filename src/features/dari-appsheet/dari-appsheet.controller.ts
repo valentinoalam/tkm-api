@@ -18,8 +18,8 @@ export class DariAppsheetController {
   findAllTransactions( 
     @Query('startDate') dateStart?: string,
     @Query('endDate') dateEnd?: string,
-    @Query('endDate') page?: number, 
-    @Query('endDate') limit?: number
+    @Query('page') page?: number, 
+    @Query('limit') limit?: number
   ) {
     return this.dariAppsheetService.findAllTransactions(dateStart, dateEnd, page, limit);
   }
