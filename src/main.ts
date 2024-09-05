@@ -1,7 +1,7 @@
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { DatabaseService } from '@core/database/database.service';
-import cookieParser from 'cookie-parser';
+import { cookieParser } from 'cookie-parser';
 import SwaggerDocumentation from './core/config/swagger.config';
 import { AppModule } from './app/app.module';
 import { ConfigService } from '@nestjs/config';
