@@ -71,6 +71,7 @@ export class DariAppsheetService {
       include: {
         category: {
           select: {
+            id: true,
             category: true, // Include the category name
             type: true,
             color: true
@@ -91,7 +92,7 @@ export class DariAppsheetService {
     const data = await getPaginatedData(this.db, 'appsheetTransaksi', query, page, limit);
     
     data.data = await data.data.map(({id, dtTransaction, activity, category, value, photo}) => ({
-      id, dtTransaction, activity, category: category.category, color: category.color, in_out: category.type, value, photo: photo? photo.name : null, downloadLink: photo? photo.downloadLink : null
+      id, dtTransaction, activity, categoryId: category.id, category: category.category, color: category.color, in_out: category.type, value, photo: photo? photo.name : null, downloadLink: photo? photo.downloadLink : null
     }))
     return data;
   }
