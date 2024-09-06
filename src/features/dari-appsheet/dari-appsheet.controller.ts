@@ -1,9 +1,37 @@
-import { Controller, Get, Body, Patch, Param, Delete, Query, Post, Put, HttpCode, HttpStatus, UploadedFile, UseInterceptors } from '@nestjs/common';
-import { DariAppsheetService } from './dari-appsheet.service';
-import { CreateAppsheetKategoriDto, CreateAppsheetTransaksiDto } from './dto/create-dari-appsheet.dto';
-import { UpdateAppsheetTransaksiDto, UpdateAppsheetKategoriDto, UpdateAppsheetPhotoDto } from './dto/update-dari-appsheet.dto';
+import {
+  Controller,
+  Get,
+  Body,
+  Param,
+  Delete,
+  Query,
+  Post,
+  Put,
+  HttpCode,
+  HttpStatus,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiOperation, ApiOkResponse, ApiConsumes, ApiCreatedResponse, ApiBadRequestResponse, ApiForbiddenResponse } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiOkResponse,
+  ApiConsumes,
+  ApiCreatedResponse,
+  ApiBadRequestResponse,
+  ApiForbiddenResponse,
+} from '@nestjs/swagger';
+
+import { DariAppsheetService } from './dari-appsheet.service';
+import {
+  CreateAppsheetKategoriDto,
+  CreateAppsheetTransaksiDto,
+} from './dto/create-dari-appsheet.dto';
+import {
+  UpdateAppsheetTransaksiDto,
+  UpdateAppsheetKategoriDto,
+  UpdateAppsheetPhotoDto,
+} from './dto/update-dari-appsheet.dto';
 
 @Controller('dari-appsheet')
 export class DariAppsheetController {
@@ -15,13 +43,18 @@ export class DariAppsheetController {
   }
 
   @Get('transactions')
-  findAllTransactions( 
+  findAllTransactions(
     @Query('startDate') dateStart?: string,
     @Query('endDate') dateEnd?: string,
-    @Query('page') page?: number, 
-    @Query('limit') limit?: number
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
   ) {
-    return this.dariAppsheetService.findAllTransactions(dateStart, dateEnd, page, limit);
+    return this.dariAppsheetService.findAllTransactions(
+      dateStart,
+      dateEnd,
+      page,
+      limit,
+    );
   }
 
   @Get('categories')
@@ -52,7 +85,9 @@ export class DariAppsheetController {
     summary: 'Create a transaction',
   })
   @ApiConsumes('multipart/form-data')
-  @ApiCreatedResponse({ description: 'Transaction has been successfully created' })
+  @ApiCreatedResponse({
+    description: 'Transaction has been successfully created',
+  })
   @ApiBadRequestResponse({
     description: 'Some character error or type error',
   })
@@ -62,7 +97,10 @@ export class DariAppsheetController {
   @UseInterceptors(FileInterceptor('file'))
   @HttpCode(HttpStatus.CREATED)
   @Post('transaksi')
-  async createTransaksi(@Body() data: CreateAppsheetTransaksiDto, @UploadedFile() file: Express.Multer.File) {
+  async createTransaksi(
+    @Body() data: CreateAppsheetTransaksiDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
     return await this.dariAppsheetService.createTransaksi(data, file);
   }
 
@@ -81,17 +119,27 @@ export class DariAppsheetController {
     description: 'Some character error or type error',
   })
   @UseInterceptors(FileInterceptor('file'))
-  async updateTransaksi(@Param('id') id: string, @Body() data: UpdateAppsheetTransaksiDto,  @UploadedFile() file: Express.Multer.File) {
+  async updateTransaksi(
+    @Param('id') id: string,
+    @Body() data: UpdateAppsheetTransaksiDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
     return await this.dariAppsheetService.updateTransaksi(id, data, file);
   }
 
   @Put('kategori/:id')
-  async updateKategori(@Param('id') id: string, @Body() data: UpdateAppsheetKategoriDto) {
+  async updateKategori(
+    @Param('id') id: string,
+    @Body() data: UpdateAppsheetKategoriDto,
+  ) {
     return await this.dariAppsheetService.updateKategori(id, data);
   }
 
   @Put('photo/:id')
-  async updatePhotoData(@Param('id') id: string, @Body() data: UpdateAppsheetPhotoDto) {
+  async updatePhotoData(
+    @Param('id') id: string,
+    @Body() data: UpdateAppsheetPhotoDto,
+  ) {
     return await this.dariAppsheetService.updatePhotoData(id, data);
   }
 

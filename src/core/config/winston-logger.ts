@@ -1,4 +1,5 @@
 import * as winston from 'winston';
+
 const { combine, timestamp, label, prettyPrint, json, simple } = winston.format;
 
 const customFormat = combine(timestamp(), label(), prettyPrint(), json());

@@ -1,18 +1,20 @@
-import { HttpAdapterHost, NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
 import { DatabaseService } from '@core/database/database.service';
-import { cookieParser } from 'cookie-parser';
-import SwaggerDocumentation from './core/config/swagger.config';
-import { AppModule } from './app/app.module';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PrismaClientExceptionFilter } from './common/filters/prisma-client-exception.filter';
+import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+
+import { AppModule } from './app/app.module';
 import { AuthExceptionsFilter } from './common/filters/auth-exception.filter';
-declare const module: any;
+import { PrismaClientExceptionFilter } from './common/filters/prisma-client-exception.filter';
+import SwaggerDocumentation from './core/config/swagger.config';
+
+declare const module;
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['log', 'error', 'warn'],
   });
+  const logger = new Logger('HTTP');
   const { httpAdapter } = app.get(HttpAdapterHost);
   const config = app.get(ConfigService);
   if (config.get('app.corsEnabled')) {
@@ -22,12 +24,12 @@ async function bootstrap() {
       credentials: true,
     });
   }
-  
+
   if (config.get('app.swaggerEnabled')) {
     const swaggerDoc = new SwaggerDocumentation(app);
     swaggerDoc.serve();
   }
-  app.use(cookieParser());
+
   app.setGlobalPrefix('api');
   app.useGlobalPipes(
     new ValidationPipe({
@@ -39,14 +41,17 @@ async function bootstrap() {
       },
     }),
   );
-  app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter), new AuthExceptionsFilter());
+  app.useGlobalFilters(
+    new PrismaClientExceptionFilter(httpAdapter),
+    new AuthExceptionsFilter(),
+  );
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
   const prismaService = app.get(DatabaseService);
   await prismaService.enableShutdownHooks(app);
 
-  const port = process.env.PORT || 6001
+  const port = process.env.PORT || 6001;
   await app.listen(port);
-  console.log("server run on " + port)
+  logger.log('server run on ' + port);
   if (module.hot) {
     module.hot.accept();
     module.hot.dispose(() => app.close());

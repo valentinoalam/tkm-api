@@ -1,6 +1,7 @@
 import { Global, Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+
 import { AppConfigService } from './service/config.service';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 // import { ConfigValidator } from './config.validator';
 // import configuration from './configuration';
 // import { envSchema } from './config.schema';

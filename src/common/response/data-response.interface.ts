@@ -1,5 +1,5 @@
 export interface DataResponse<T> {
-    records: T[];
-    totalRecords: number;
-    page: number;
-  }
+  records: T[];
+  totalRecords: number;
+  page: number;
+}

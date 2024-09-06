@@ -1,23 +1,23 @@
-import { UpdateUserDto } from '../dto/update-user.dto';
+import * as fs from 'fs';
+
+import { DatabaseService } from '@core/database/database.service';
 import {
   Injectable,
   ForbiddenException,
   NotFoundException,
-  BadRequestException,
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { hash, verify } from 'argon2';
 
-import { DatabaseService } from '@core/database/database.service';
-import { CreateUserDto } from '../dto/create-user.dto';
-import { User as UserEntity } from '../entities/user.entity';
-import * as fakeData from '@/shared/fake-data'; 
+import { UpdateProfileDto, CreateProfileDto } from '../components/profile/dto';
 import { Profile } from '../components/profile/entities/profile.entity';
-import { UpdateProfileDto } from '../components/profile/dto'
-import { CreateProfileDto } from '../components/profile/dto';
-import * as fs from 'fs';
+import { CreateUserDto } from '../dto/create-user.dto';
+import { UpdateUserDto } from '../dto/update-user.dto';
+import { User as UserEntity } from '../entities/user.entity';
+
+import * as fakeData from '@/shared/fake-data';
 
 @Injectable()
 export class UsersService {
@@ -25,15 +25,16 @@ export class UsersService {
 
   async createFakeData(): Promise<any> {
     const fakeUser = fakeData.fakeUser(); // Generate 10 fake users
-    const fakeProfile = fakeData.fakeProfile()
+    const fakeProfile = fakeData.fakeProfile();
     const data = await fs.promises.readFile('users.json', 'utf8');
-    const newUser = fakeUser.username + ', password: ' + fakeUser.hashedPassword
-    let users = JSON.parse(data);
+    const newUser =
+      fakeUser.username + ', password: ' + fakeUser.hashedPassword;
+    const users = JSON.parse(data);
     users.push(newUser);
     const jsonData = JSON.stringify(users, null, 2);
     fs.writeFile('users.json', jsonData, (err) => {
       if (err) {
-      console.error('Error writing data to file', err);
+        console.error('Error writing data to file', err);
       }
       console.log('User data updated and saved to users.json');
     });
@@ -42,20 +43,19 @@ export class UsersService {
     fakeUser.hashedPassword = await hash(fakeUser.hashedPassword); // Assuming a hashPassword function
 
     // Save the fake data to the database using Prisma
-    let user = await this.db.user.create({ 
+    const user = await this.db.user.create({
       data: {
-        ...fakeUser, 
+        ...fakeUser,
         profile: {
-          create: {...fakeProfile },
-        }
+          create: { ...fakeProfile },
+        },
       },
-        include: { profile: true }, })
+      include: { profile: true },
+    });
     return user;
   }
 
-  async create(
-    dto: CreateUserDto, profileDto: CreateProfileDto
-  ): Promise<any> {
+  async create(dto: CreateUserDto, profileDto: CreateProfileDto): Promise<any> {
     // generate the password hash
     const { username, email } = dto;
     let user = await this.db.user.findFirst({ where: { username } });
@@ -63,7 +63,7 @@ export class UsersService {
       throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
     }
     const hashedPassword = await hash(dto.hashedPassword);
-   
+
     user = await this.db.user
       .create({
         data: {
@@ -77,7 +77,7 @@ export class UsersService {
               address: profileDto.address,
             },
           },
-          hashedPassword: hashedPassword
+          hashedPassword: hashedPassword,
         },
         include: { profile: true },
       })
@@ -94,29 +94,24 @@ export class UsersService {
     return user;
   }
 
-  async validateUser(
-    username: string,
-    password: string,
-  ): Promise<any | null> {
-
+  async validateUser(username: string, password: string): Promise<any | null> {
     // const validate = await this.db.user.compare(
     //   password,
     //   user?.getPassword(),
     // );
     // return validate ? user : null;
     const user = await this.db.user.findUnique({
-      where: { id:username },
+      where: { id: username },
     });
     if (!user) {
       throw new NotFoundException('The item does not exist');
     }
-    if (user && await verify(password, user.hashedPassword)) {
+    if (user && (await verify(password, user.hashedPassword))) {
       const { hashedPassword, ...result } = user;
       return result;
     }
 
     return null;
-  
   }
   async getIAM(id: string): Promise<any> {
     // const decodedUserInfo = req.user as { id: string; email: string };
@@ -236,22 +231,17 @@ export class UsersService {
     userId: string,
   ) {
     let updateData = new UserEntity();
-    const profileDto = [
-      'name',
-      'file',
-      'position',
-      'phone',
-      'address',
-    ];
-    if (dto.hashedPassword) updateData.hashedPassword = await hash(dto.hashedPassword);
+    const profileDto = ['name', 'file', 'position', 'phone', 'address'];
+    if (dto.hashedPassword)
+      updateData.hashedPassword = await hash(dto.hashedPassword);
     delete dto.hashedPassword;
 
-    let filteredDto: any = {};
+    const filteredDto: any = {};
 
-    let filteredUserDto: Partial<UserEntity> = {};
+    const filteredUserDto: Partial<UserEntity> = {};
 
     let filteredProfileDto: Partial<Profile> = {};
-    
+
     for (const prop in dto) {
       if (dto[prop]) {
         filteredDto[prop] = dto[prop];
@@ -286,14 +276,14 @@ export class UsersService {
         where: { id: id },
         data: {
           ...updateData,
-          profile: { 
+          profile: {
             update: {
               name: filteredProfileDto.name,
               profilePic: filteredProfileDto.profilePic,
               phone: filteredProfileDto.phone,
               address: filteredProfileDto.address,
-              position: filteredProfileDto.position
-            } 
+              position: filteredProfileDto.position,
+            },
           },
           userNotification: {
             // Update logic for user notifications
@@ -317,7 +307,6 @@ export class UsersService {
         }
         throw error;
       });
-
 
     return updatedUser;
   }

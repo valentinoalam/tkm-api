@@ -1,5 +1,3 @@
-import {ApiProperty} from '@nestjs/swagger'
-
 export class UpdateConfigDto {
   name?: string;
   description?: string;
@@ -8,5 +6,4 @@ export class UpdateConfigDto {
   tempValue?: string;
   dtModified?: string;
   userModified?: string;
-  
 }

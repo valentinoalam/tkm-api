@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+
 import { CreateUstadzDto } from './dto/create-ustadz.dto';
 import { UpdateUstadzDto } from './dto/update-ustadz.dto';
 

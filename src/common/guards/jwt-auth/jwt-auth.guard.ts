@@ -6,9 +6,9 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ExtractJwt } from 'passport-jwt';
-import { Observable } from 'rxjs';
 import { Request } from 'express';
+import { ExtractJwt } from 'passport-jwt';
+
 const cookieExtractor = (req: Request) => {
   if (req && req.cookies) {
     return req.cookies['jwt'];

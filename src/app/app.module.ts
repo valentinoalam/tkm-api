@@ -1,19 +1,24 @@
-import { MiddlewareConsumer, Module, NestModule, OnModuleInit } from '@nestjs/common';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { ScheduleModule } from '@nestjs/schedule';
-import { DatabaseModule } from '../core/database/database.module';
 import { join } from 'path';
-import { AppService } from './app.service';
-import { AppController } from './app.controller';
-import { HealthModule } from './health/health.module';
-import { ConfigModule } from '@nestjs/config';
-import configuration from '@core/config/configuration';
-import { ConfigValidator } from '@/core/config/validator/config.validator';
-import { utilities as nestWinstonModuleUtilities, WinstonModule } from 'nest-winston';
-import * as winston from 'winston';
-import { LoggedMiddleware } from '@common/middlewares/logged.middleware';
-import { FeaturesModule } from '@/features/features.module';
 
+import { LoggedMiddleware } from '@common/middlewares/logged.middleware';
+import configuration from '@core/config/configuration';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import {
+  utilities as nestWinstonModuleUtilities,
+  WinstonModule,
+} from 'nest-winston';
+import * as winston from 'winston';
+
+import { DatabaseModule } from '../core/database/database.module';
+
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { HealthModule } from './health/health.module';
+
+import { ConfigValidator } from '@/core/config/validator/config.validator';
+import { FeaturesModule } from '@/features/features.module';
 
 @Module({
   imports: [
@@ -40,7 +45,7 @@ import { FeaturesModule } from '@/features/features.module';
           ),
         }),
       ],
-    //   // other options
+      //   // other options
     }),
     // ScheduleModule.forRoot(),
     ServeStaticModule.forRoot({
@@ -50,19 +55,18 @@ import { FeaturesModule } from '@/features/features.module';
     //   inject: [AppConfigService],
     //   imports: [AppConfigModule],
     // }),
-    FeaturesModule
+    FeaturesModule,
   ],
 
-  controllers: [AppController, /*SseController*/],
+  controllers: [AppController /*SseController*/],
   providers: [
-    AppService, 
+    AppService,
     // SseService,
     // BroadcastService,
-    LoggedMiddleware
+    LoggedMiddleware,
     /*ConfigValidator*/
   ],
 })
-
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LoggedMiddleware).forRoutes('*');

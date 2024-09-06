@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+
 import { Participant } from '../../entities';
 
 export class EmergencyContact {

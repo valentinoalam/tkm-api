@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+
 import { ParticipantsController } from './participants.controller';
 import { ParticipantsService } from './participants.service';
 

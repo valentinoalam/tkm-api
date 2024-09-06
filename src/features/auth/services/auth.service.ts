@@ -1,15 +1,16 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
-import { hash, verify } from 'argon2';
-import { JwtPayload } from '../payloads/jwtPayload.type';
 import { DatabaseService } from '@core/database/database.service';
-import { SigninDto } from '../dto';
-import { Tokens } from '../types';
+import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import { hash, verify } from 'argon2';
+import { Response } from 'express';
+
 import { UsersService } from '../../users/services/users.service';
+import { SigninDto } from '../dto';
+import { JwtPayload } from '../payloads/jwtPayload.type';
+import { Tokens } from '../types';
+
 import { User } from '@/features/users/entities';
-import { NextFunction, Response } from 'express';
-import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Injectable()
 export class AuthService {
@@ -18,8 +19,7 @@ export class AuthService {
     private jwt: JwtService,
     private config: ConfigService,
     private usersService: UsersService,
-  ) {
-  }
+  ) {}
 
   async signin(dto: SigninDto): Promise<{ tokens: Tokens; user: any }> {
     // find the user by username
@@ -52,8 +52,7 @@ export class AuthService {
     const pass = await verify(user.hashedPassword, dto.password);
 
     // if password incorrect throw exception
-    if (!pass)
-      throw new ForbiddenException('Invalid username or password.');
+    if (!pass) throw new ForbiddenException('Invalid username or password.');
 
     // send back the user
     delete user.hashedPassword; // Tidak perlu lg karena sudah pakai return jwt

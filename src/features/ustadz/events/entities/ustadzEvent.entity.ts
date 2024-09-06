@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
+
 import { Ustadz } from '../../entities';
+
 import { Event } from './event.entity';
 
 export class UstadzEvent {

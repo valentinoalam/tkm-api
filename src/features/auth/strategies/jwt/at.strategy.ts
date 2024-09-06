@@ -1,10 +1,11 @@
+import { DatabaseService } from '@core/database/database.service';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Request } from 'express';
+import { ExtractJwt, Strategy } from 'passport-jwt';
+
 import { JwtPayload } from '../../payloads/jwtPayload.type';
-import { DatabaseService } from '@core/database/database.service';
 
 @Injectable()
 export class AtStrategy extends PassportStrategy(Strategy, 'jwt-access') {
@@ -36,7 +37,7 @@ export class AtStrategy extends PassportStrategy(Strategy, 'jwt-access') {
         email: true,
       },
     });
-    req.user = user
+    req.user = user;
     return user;
   }
 }

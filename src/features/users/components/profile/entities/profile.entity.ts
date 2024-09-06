@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { User } from '@/features/users/entities';
+
 import { Participant } from '@/features/events/components/participants/entities';
+import { User } from '@/features/users/entities';
 
 export class Profile {
   @ApiProperty({

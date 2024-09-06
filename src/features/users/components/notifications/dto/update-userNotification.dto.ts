@@ -1,5 +1,5 @@
-import { NotificationStatus } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+import { NotificationStatus } from '@prisma/client';
 import { IsOptional } from 'class-validator';
 
 export class UpdateUserNotificationDto {

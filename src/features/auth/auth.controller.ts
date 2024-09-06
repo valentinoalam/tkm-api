@@ -1,3 +1,4 @@
+import { AtGuard, RtGuard } from '@common/guards';
 import {
   Controller,
   Post,
@@ -10,9 +11,7 @@ import {
   Res,
   UseInterceptors,
   ClassSerializerInterceptor,
-  UploadedFile,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
@@ -21,8 +20,9 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import { Request, Response } from 'express';
+
 // import { AuthService } from './auth.service';
-import { AtGuard, RtGuard } from '@common/guards';
 import { SigninDto } from './dto';
 import { AuthService } from './services/auth.service';
 
@@ -47,8 +47,7 @@ export class AuthController {
     try {
       const user = await this.authService.getIAM(req.user['sub']);
 
-      const { name, profilePic, position, phone, address } =
-        user.profile;
+      const { name, profilePic, position, phone, address } = user.profile;
       const { username, email } = user;
       dataOut.data.user = {
         username,
@@ -184,9 +183,7 @@ export class AuthController {
     description: 'Access Denied',
   })
   @HttpCode(HttpStatus.OK)
-  async refreshToken(
-    @Req() req: Request
-  ) {
+  async refreshToken(@Req() req: Request) {
     const dataOut = {
       status: true,
       message: '',
@@ -199,7 +196,7 @@ export class AuthController {
     try {
       const tokens = await this.authService.refreshToken(
         req.user['sub'],
-        req.user['refreshToken']
+        req.user['refreshToken'],
       );
 
       dataOut.data.tokens = tokens;

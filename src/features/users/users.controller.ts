@@ -1,7 +1,6 @@
 import {
   Controller,
   Get,
-  UseGuards,
   Req,
   Body,
   Param,
@@ -12,26 +11,19 @@ import {
   HttpCode,
   UploadedFile,
   UseInterceptors,
-  Res,
-  Sse,
-  ForbiddenException,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBadRequestResponse,
-  ApiBearerAuth,
   ApiConsumes,
-  ApiCreatedResponse,
-  ApiForbiddenResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
 
+import { UpdateUserDto } from './dto';
 import { UsersService } from './services/users.service';
-import { CreateUserDto, UpdateUserDto } from './dto';
-import { Observable, interval, map } from 'rxjs';
 
 @ApiTags('Users')
 // @ApiBearerAuth('access-token')
@@ -195,7 +187,6 @@ export class UsersController {
 
   @Post('search-first')
   searchFirst(@Body() query: any, @Req() req: Request) {
-
     return this.usersService.searchFirst(query);
   }
 
@@ -247,8 +238,7 @@ export class UsersController {
         userId,
       );
 
-      const { name, profilePic, position, phone, address } =
-        user.profile;
+      const { name, profilePic, position, phone, address } = user.profile;
       const { username, email } = user;
       dataOut.data.user = {
         username,
@@ -285,7 +275,7 @@ export class UsersController {
 
       const { username, email } = user;
 
-      dataOut.data.user = { username, email};
+      dataOut.data.user = { username, email };
     } catch (error) {
       dataOut.status = false;
       dataOut.message = error.message;

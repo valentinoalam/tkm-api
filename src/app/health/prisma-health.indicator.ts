@@ -1,6 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { HealthCheckError, HealthIndicator, HealthIndicatorResult } from '@nestjs/terminus';
 import { DatabaseService } from '@core/database/database.service';
+import { Injectable } from '@nestjs/common';
+import {
+  HealthCheckError,
+  HealthIndicator,
+  HealthIndicatorResult,
+} from '@nestjs/terminus';
 
 @Injectable()
 export class PrismaHealthIndicator extends HealthIndicator {

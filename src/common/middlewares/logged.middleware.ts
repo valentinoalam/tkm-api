@@ -1,9 +1,10 @@
 import { Injectable, Logger, NestMiddleware } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
+
 @Injectable()
 export class LoggedMiddleware implements NestMiddleware {
   private logger = new Logger('HTTP');
-  
+
   use(req: Request, res: Response, next: NextFunction) {
     const start = Date.now();
     const { ip, method, originalUrl, headers } = req;
@@ -15,7 +16,7 @@ export class LoggedMiddleware implements NestMiddleware {
       const { statusCode, statusMessage } = res;
       const contentLength = res.get('content-length');
       const responseTime = Date.now() - start;
-      const logFormat = `Response: ${method} ${originalUrl} ${ip} ${statusCode} Message:${statusMessage} Length: ${contentLength} - ${responseTime}ms`
+      const logFormat = `Response: ${method} ${originalUrl} ${ip} ${statusCode} Message:${statusMessage} Length: ${contentLength} - ${responseTime}ms`;
       if (statusCode >= 500) {
         return this.logger.error(logFormat);
       }

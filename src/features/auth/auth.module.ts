@@ -1,20 +1,22 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt/dist';
 import { PassportModule } from '@nestjs/passport';
+
+import { UsersService } from '../users/services/users.service';
+import { UsersModule } from '../users/users.module';
+
 import { AuthController } from './auth.controller';
 import { AuthService } from './services/auth.service';
-import { AtStrategy, RtStrategy } from './strategies/jwt';
-import { UsersModule } from '../users/users.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { LocalStrategy } from './strategies/local/local.strategy';
 import { SessionSerializer } from './session.serializer';
-import { UsersService } from '../users/services/users.service';
+import { AtStrategy, RtStrategy } from './strategies/jwt';
+import { LocalStrategy } from './strategies/local/local.strategy';
 
 @Module({
   imports: [
     UsersModule,
     JwtModule.register({
-      secret:  process.env.WBMS_JWT_AT_KEY,
+      secret: process.env.WBMS_JWT_AT_KEY,
       signOptions: { expiresIn: '5h' },
     }),
     JwtModule.registerAsync({
@@ -30,7 +32,14 @@ import { UsersService } from '../users/services/users.service';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, UsersService, RtStrategy, AtStrategy, LocalStrategy, SessionSerializer],
+  providers: [
+    AuthService,
+    UsersService,
+    RtStrategy,
+    AtStrategy,
+    LocalStrategy,
+    SessionSerializer,
+  ],
   exports: [AuthService],
 })
 export class AuthModule {}

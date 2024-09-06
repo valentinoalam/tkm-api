@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+
 import { User } from '../entities/user.entity';
+
 import { UserEvents } from './users.event';
 
 @Injectable()

@@ -1,36 +1,46 @@
-import { Injectable, Query } from '@nestjs/common';
-import { DatabaseService } from '@/core/database/database.service';
-import { UpdateAppsheetKategoriDto, UpdateAppsheetPhotoDto, UpdateAppsheetTransaksiDto } from './dto/update-dari-appsheet.dto';
-import { CreateAppsheetKategoriDto, CreateAppsheetTransaksiDto } from './dto/create-dari-appsheet.dto';
 import path from 'path';
-import { getPaginatedData } from '@/shared/helper';
+
+import { Injectable } from '@nestjs/common';
+
+import {
+  CreateAppsheetKategoriDto,
+  CreateAppsheetTransaksiDto,
+} from './dto/create-dari-appsheet.dto';
+import {
+  UpdateAppsheetKategoriDto,
+  UpdateAppsheetPhotoDto,
+  UpdateAppsheetTransaksiDto,
+} from './dto/update-dari-appsheet.dto';
+
+import { DatabaseService } from '@/core/database/database.service';
+import { getPaginatedData } from '@/shared/utils/paginate-data.utils';
+
 @Injectable()
 export class DariAppsheetService {
-
   constructor(private db: DatabaseService) {}
 
   async showAllNotaImage() {
     return this.db.appsheetPhoto.findMany({
       include: {
         transaksi: {
-          select:{
+          select: {
             id: true,
             dtTransaction: true,
             activity: true,
             value: true,
             category: {
-              select:{
+              select: {
                 category: true,
-                type: true
-              }
+                type: true,
+              },
             },
-          }
-        }
+          },
+        },
       },
       orderBy: {
         transaksi: {
           dtTransaction: 'desc',
-        }
+        },
       },
     });
   }
@@ -43,7 +53,7 @@ export class DariAppsheetService {
           select: {
             category: true, // Include the category name
             type: true,
-            color: true
+            color: true,
           },
         },
       },
@@ -51,13 +61,24 @@ export class DariAppsheetService {
         dtTransaction: 'desc',
       },
     });
-    
-    const transactionData = await data.map(({dtTransaction, category, value}) => ({
-      dtTransaction, category: category.category, color: category.color, in_out: category.type, value,
-    }))
+
+    const transactionData = await data.map(
+      ({ dtTransaction, category, value }) => ({
+        dtTransaction,
+        category: category.category,
+        color: category.color,
+        in_out: category.type,
+        value,
+      }),
+    );
     return transactionData;
   }
-  async findAllTransactions(dateStart?: string, dateEnd?: string, page?: number, limit?: number) {
+  async findAllTransactions(
+    dateStart?: string,
+    dateEnd?: string,
+    page?: number,
+    limit?: number,
+  ) {
     const filters: any = {};
     if (dateStart) {
       filters.gte = new Date(dateStart);
@@ -65,7 +86,10 @@ export class DariAppsheetService {
     if (dateEnd) {
       filters.lte = new Date(dateEnd);
     }
-    const whereClause = dateStart || dateEnd ? { dtTransaction: filters, isDeleted: false } : {isDeleted: false};
+    const whereClause =
+      dateStart || dateEnd
+        ? { dtTransaction: filters, isDeleted: false }
+        : { isDeleted: false };
     const query = {
       where: whereClause,
       include: {
@@ -74,26 +98,43 @@ export class DariAppsheetService {
             id: true,
             category: true, // Include the category name
             type: true,
-            color: true
+            color: true,
           },
         },
         photo: {
           select: {
             name: true,
-            downloadLink: true
-          }
-        }
+            downloadLink: true,
+          },
+        },
       },
       orderBy: {
         dtTransaction: 'desc',
       },
-    }
-    
-    const data = await getPaginatedData(this.db, 'appsheetTransaksi', query, page, limit);
-    
-    data.data = await data.data.map(({id, dtTransaction, activity, category, value, photo}) => ({
-      id, dtTransaction, activity, categoryId: category.id, category: category.category, color: category.color, in_out: category.type, value, photo: photo? photo.name : null, downloadLink: photo? photo.downloadLink : null
-    }))
+    };
+
+    const data = await getPaginatedData(
+      this.db,
+      'appsheetTransaksi',
+      query,
+      page,
+      limit,
+    );
+
+    data.data = await data.data.map(
+      ({ id, dtTransaction, activity, category, value, photo }) => ({
+        id,
+        dtTransaction,
+        activity,
+        categoryId: category.id,
+        category: category.category,
+        color: category.color,
+        in_out: category.type,
+        value,
+        photo: photo ? photo.name : null,
+        downloadLink: photo ? photo.downloadLink : null,
+      }),
+    );
     return data;
   }
 
@@ -110,14 +151,20 @@ export class DariAppsheetService {
       where: { id },
     });
   }
-  
-  async createTransaksi(data: CreateAppsheetTransaksiDto, file: Express.Multer.File = null) {
-    const {categoryId, ...rest} = data;
+
+  async createTransaksi(
+    data: CreateAppsheetTransaksiDto,
+    file: Express.Multer.File = null,
+  ) {
+    const { categoryId, ...rest } = data;
     let transaksi;
-   
+
     if (file) {
       const originalFilePath = file.path;
-      const thumbnailFilePath = path.join(path.dirname(originalFilePath), 'small/' + file.filename);
+      const thumbnailFilePath = path.join(
+        path.dirname(originalFilePath),
+        'small/' + file.filename,
+      );
       // Process the image to create a thumbnail
       const sharp = require('sharp');
       await sharp(originalFilePath)
@@ -127,42 +174,49 @@ export class DariAppsheetService {
         ...rest,
         category: {
           connect: {
-            id: categoryId
-          }
+            id: categoryId,
+          },
         },
         photo: {
           create: {
             name: file.filename,
             thumbnailLink: thumbnailFilePath,
             imageLink: originalFilePath,
-            downloadLink: null
-          }
-        }
-      }
+            downloadLink: null,
+          },
+        },
+      };
     } else {
       transaksi = {
         ...rest,
         category: {
           connect: {
-            id: categoryId
-          }
+            id: categoryId,
+          },
         },
-      }
+      };
     }
     return await this.db.appsheetTransaksi.create({ data: transaksi });
   }
 
   async createKategori(data: CreateAppsheetKategoriDto) {
     return await this.db.appsheetKategori.create({
-      data
+      data,
     });
   }
 
-  async updateTransaksi(id: string, data: UpdateAppsheetTransaksiDto, file: Express.Multer.File) {
+  async updateTransaksi(
+    id: string,
+    data: UpdateAppsheetTransaksiDto,
+    file: Express.Multer.File,
+  ) {
     let transaksi;
     if (file) {
       const originalFilePath = file.path;
-      const thumbnailFilePath = path.join(path.dirname(originalFilePath), 'small/' + file.filename);
+      const thumbnailFilePath = path.join(
+        path.dirname(originalFilePath),
+        'small/' + file.filename,
+      );
       // Process the image to create a thumbnail
       const sharp = require('sharp');
       await sharp(originalFilePath)
@@ -174,14 +228,14 @@ export class DariAppsheetService {
           create: {
             name: file.filename,
             imageLink: thumbnailFilePath,
-            thumbnailLink: originalFilePath
+            thumbnailLink: originalFilePath,
           },
         },
-      }
+      };
     } else {
-      transaksi = data
+      transaksi = data;
     }
-    
+
     return this.db.appsheetTransaksi.update({
       where: { id },
       data: transaksi,
@@ -212,9 +266,8 @@ export class DariAppsheetService {
     return this.db.appsheetTransaksi.update({
       where: { id },
       data: {
-        isDeleted: true
-      }
+        isDeleted: true,
+      },
     });
   }
-
 }

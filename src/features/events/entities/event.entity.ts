@@ -1,6 +1,8 @@
-import { Period } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+import { Period } from '@prisma/client';
+
 import { Participant } from '../components/participants/entities';
+
 import { Position } from '@/features/users/components/position/entities';
 import { UstadzEvent } from '@/features/ustadz/events/entities';
 

@@ -9,9 +9,7 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class AppConfigService {
   // private readonly envConfig: Record<string, string>;
-  constructor(
-    private configService: ConfigService,
-  ) {
+  constructor(private configService: ConfigService) {
     // this.loadConfig();
     // console.log("app", this.config);
   }

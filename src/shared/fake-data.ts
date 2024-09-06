@@ -1,8 +1,16 @@
-import { NotificationStatus, Boundary, TransactionType, ProgramStatus, AccountType, WeekDay, Period, AcquisitionOrigin, AssetTypes } from '@prisma/client';
 import { faker } from '@faker-js/faker';
+import {
+  NotificationStatus,
+  Boundary,
+  TransactionType,
+  ProgramStatus,
+  AccountType,
+  WeekDay,
+  Period,
+  AcquisitionOrigin,
+  AssetTypes,
+} from '@prisma/client';
 import Decimal from 'decimal.js';
-
-
 
 export function fakeNotification() {
   return {
@@ -26,7 +34,13 @@ export function fakeNotificationComplete() {
 }
 export function fakeUserNotification() {
   return {
-    status: faker.helpers.arrayElement([NotificationStatus.Pending, NotificationStatus.Sent, NotificationStatus.Failed, NotificationStatus.Delivered, NotificationStatus.Readed] as const),
+    status: faker.helpers.arrayElement([
+      NotificationStatus.Pending,
+      NotificationStatus.Sent,
+      NotificationStatus.Failed,
+      NotificationStatus.Delivered,
+      NotificationStatus.Readed,
+    ] as const),
   };
 }
 export function fakeUserNotificationComplete() {
@@ -34,7 +48,13 @@ export function fakeUserNotificationComplete() {
     id: faker.string.uuid(),
     userId: faker.string.uuid(),
     notification_id: faker.string.uuid(),
-    status: faker.helpers.arrayElement([NotificationStatus.Pending, NotificationStatus.Sent, NotificationStatus.Failed, NotificationStatus.Delivered, NotificationStatus.Readed] as const),
+    status: faker.helpers.arrayElement([
+      NotificationStatus.Pending,
+      NotificationStatus.Sent,
+      NotificationStatus.Failed,
+      NotificationStatus.Delivered,
+      NotificationStatus.Readed,
+    ] as const),
   };
 }
 export function fakeProfile() {
@@ -89,7 +109,11 @@ export function fakeTransactionCategory() {
   return {
     name: faker.person.fullName(),
     description: faker.lorem.words(5),
-    boundary: faker.helpers.arrayElement([Boundary.Permanen, Boundary.Sementara, Boundary.Tanpa_Batasan] as const),
+    boundary: faker.helpers.arrayElement([
+      Boundary.Permanen,
+      Boundary.Sementara,
+      Boundary.Tanpa_Batasan,
+    ] as const),
   };
 }
 export function fakeTransactionCategoryComplete() {
@@ -97,7 +121,11 @@ export function fakeTransactionCategoryComplete() {
     id: faker.string.uuid(),
     name: faker.person.fullName(),
     description: faker.lorem.words(5),
-    boundary: faker.helpers.arrayElement([Boundary.Permanen, Boundary.Sementara, Boundary.Tanpa_Batasan] as const),
+    boundary: faker.helpers.arrayElement([
+      Boundary.Permanen,
+      Boundary.Sementara,
+      Boundary.Tanpa_Batasan,
+    ] as const),
     createdAt: new Date(),
     updatedAt: undefined,
   };
@@ -121,7 +149,10 @@ export function fakeTransactionActivityComplete() {
 export function fakeTransaction() {
   return {
     accountId: faker.lorem.words(5),
-    type: faker.helpers.arrayElement([TransactionType.Pengeluaran, TransactionType.Penerimaan] as const),
+    type: faker.helpers.arrayElement([
+      TransactionType.Pengeluaran,
+      TransactionType.Penerimaan,
+    ] as const),
     description: faker.lorem.words(5),
     refCode: undefined,
     dtTrx: faker.date.anytime(),
@@ -139,7 +170,10 @@ export function fakeTransactionComplete() {
     vendorId: undefined,
     mediaId: undefined,
     programId: undefined,
-    type: faker.helpers.arrayElement([TransactionType.Pengeluaran, TransactionType.Penerimaan] as const),
+    type: faker.helpers.arrayElement([
+      TransactionType.Pengeluaran,
+      TransactionType.Penerimaan,
+    ] as const),
     description: faker.lorem.words(5),
     refCode: undefined,
     dtTrx: faker.date.anytime(),
@@ -155,7 +189,11 @@ export function fakeProgram() {
     budget: new Decimal(faker.number.float()),
     realisation: new Decimal(faker.number.float()),
     uptake: new Decimal(faker.number.float()),
-    status: faker.helpers.arrayElement([ProgramStatus.Fundraising, ProgramStatus.OnProgress, ProgramStatus.Completed] as const),
+    status: faker.helpers.arrayElement([
+      ProgramStatus.Fundraising,
+      ProgramStatus.OnProgress,
+      ProgramStatus.Completed,
+    ] as const),
     updatedAt: undefined,
   };
 }
@@ -165,7 +203,11 @@ export function fakeProgramComplete() {
     budget: new Decimal(faker.number.float()),
     realisation: new Decimal(faker.number.float()),
     uptake: new Decimal(faker.number.float()),
-    status: faker.helpers.arrayElement([ProgramStatus.Fundraising, ProgramStatus.OnProgress, ProgramStatus.Completed] as const),
+    status: faker.helpers.arrayElement([
+      ProgramStatus.Fundraising,
+      ProgramStatus.OnProgress,
+      ProgramStatus.Completed,
+    ] as const),
     createdAt: new Date(),
     updatedAt: undefined,
   };
@@ -174,7 +216,13 @@ export function fakeAccount() {
   return {
     code: faker.lorem.words(5),
     name: faker.person.fullName(),
-    type: faker.helpers.arrayElement([AccountType.Asset, AccountType.Liability, AccountType.Equity, AccountType.Income, AccountType.Expense] as const),
+    type: faker.helpers.arrayElement([
+      AccountType.Asset,
+      AccountType.Liability,
+      AccountType.Equity,
+      AccountType.Income,
+      AccountType.Expense,
+    ] as const),
     description: faker.lorem.words(5),
     startBalance: new Decimal(faker.number.float()),
     currentBalance: undefined,
@@ -187,7 +235,13 @@ export function fakeAccountComplete() {
     parentAccountId: undefined,
     code: faker.lorem.words(5),
     name: faker.person.fullName(),
-    type: faker.helpers.arrayElement([AccountType.Asset, AccountType.Liability, AccountType.Equity, AccountType.Income, AccountType.Expense] as const),
+    type: faker.helpers.arrayElement([
+      AccountType.Asset,
+      AccountType.Liability,
+      AccountType.Equity,
+      AccountType.Income,
+      AccountType.Expense,
+    ] as const),
     description: faker.lorem.words(5),
     startBalance: new Decimal(faker.number.float()),
     currentBalance: undefined,
@@ -257,8 +311,22 @@ export function fakeLedger() {
     name: faker.person.fullName(),
     description: faker.lorem.words(5),
     updatedAt: undefined,
-    reportPeriod: faker.helpers.arrayElement([Period.DAILY, Period.WEEKLY, Period.MONTHLY, Period.QUARTERLY, Period.YEARLY] as const),
-    startWeekDay: faker.helpers.arrayElement([WeekDay.MONDAY, WeekDay.TUESDAY, WeekDay.WEDNESDAY, WeekDay.THURSDAY, WeekDay.FRIDAY, WeekDay.SATURDAY, WeekDay.SUNDAY] as const),
+    reportPeriod: faker.helpers.arrayElement([
+      Period.DAILY,
+      Period.WEEKLY,
+      Period.MONTHLY,
+      Period.QUARTERLY,
+      Period.YEARLY,
+    ] as const),
+    startWeekDay: faker.helpers.arrayElement([
+      WeekDay.MONDAY,
+      WeekDay.TUESDAY,
+      WeekDay.WEDNESDAY,
+      WeekDay.THURSDAY,
+      WeekDay.FRIDAY,
+      WeekDay.SATURDAY,
+      WeekDay.SUNDAY,
+    ] as const),
   };
 }
 export function fakeLedgerComplete() {
@@ -268,8 +336,22 @@ export function fakeLedgerComplete() {
     description: faker.lorem.words(5),
     createdAt: new Date(),
     updatedAt: undefined,
-    reportPeriod: faker.helpers.arrayElement([Period.DAILY, Period.WEEKLY, Period.MONTHLY, Period.QUARTERLY, Period.YEARLY] as const),
-    startWeekDay: faker.helpers.arrayElement([WeekDay.MONDAY, WeekDay.TUESDAY, WeekDay.WEDNESDAY, WeekDay.THURSDAY, WeekDay.FRIDAY, WeekDay.SATURDAY, WeekDay.SUNDAY] as const),
+    reportPeriod: faker.helpers.arrayElement([
+      Period.DAILY,
+      Period.WEEKLY,
+      Period.MONTHLY,
+      Period.QUARTERLY,
+      Period.YEARLY,
+    ] as const),
+    startWeekDay: faker.helpers.arrayElement([
+      WeekDay.MONDAY,
+      WeekDay.TUESDAY,
+      WeekDay.WEDNESDAY,
+      WeekDay.THURSDAY,
+      WeekDay.FRIDAY,
+      WeekDay.SATURDAY,
+      WeekDay.SUNDAY,
+    ] as const),
   };
 }
 export function fakeVendor() {
@@ -326,8 +408,24 @@ export function fakeAsset() {
     updatedAt: undefined,
     createdBy: faker.lorem.words(5),
     editedBy: faker.lorem.words(5),
-    type: faker.helpers.arrayElement([AssetTypes.Fixed, AssetTypes.NonFixed, AssetTypes.Current, AssetTypes.NonCurrent] as const),
-    origin: faker.helpers.arrayElement([AcquisitionOrigin.Donation, AcquisitionOrigin.Purchase, AcquisitionOrigin.Lease, AcquisitionOrigin.Rental, AcquisitionOrigin.Pledges, AcquisitionOrigin.MosqueBuildingFund, AcquisitionOrigin.RemnantProgramFund, AcquisitionOrigin.InvestmentReturns, AcquisitionOrigin.Grants, AcquisitionOrigin.Other] as const),
+    type: faker.helpers.arrayElement([
+      AssetTypes.Fixed,
+      AssetTypes.NonFixed,
+      AssetTypes.Current,
+      AssetTypes.NonCurrent,
+    ] as const),
+    origin: faker.helpers.arrayElement([
+      AcquisitionOrigin.Donation,
+      AcquisitionOrigin.Purchase,
+      AcquisitionOrigin.Lease,
+      AcquisitionOrigin.Rental,
+      AcquisitionOrigin.Pledges,
+      AcquisitionOrigin.MosqueBuildingFund,
+      AcquisitionOrigin.RemnantProgramFund,
+      AcquisitionOrigin.InvestmentReturns,
+      AcquisitionOrigin.Grants,
+      AcquisitionOrigin.Other,
+    ] as const),
   };
 }
 export function fakeAssetComplete() {
@@ -342,8 +440,24 @@ export function fakeAssetComplete() {
     updatedAt: undefined,
     createdBy: faker.lorem.words(5),
     editedBy: faker.lorem.words(5),
-    type: faker.helpers.arrayElement([AssetTypes.Fixed, AssetTypes.NonFixed, AssetTypes.Current, AssetTypes.NonCurrent] as const),
-    origin: faker.helpers.arrayElement([AcquisitionOrigin.Donation, AcquisitionOrigin.Purchase, AcquisitionOrigin.Lease, AcquisitionOrigin.Rental, AcquisitionOrigin.Pledges, AcquisitionOrigin.MosqueBuildingFund, AcquisitionOrigin.RemnantProgramFund, AcquisitionOrigin.InvestmentReturns, AcquisitionOrigin.Grants, AcquisitionOrigin.Other] as const),
+    type: faker.helpers.arrayElement([
+      AssetTypes.Fixed,
+      AssetTypes.NonFixed,
+      AssetTypes.Current,
+      AssetTypes.NonCurrent,
+    ] as const),
+    origin: faker.helpers.arrayElement([
+      AcquisitionOrigin.Donation,
+      AcquisitionOrigin.Purchase,
+      AcquisitionOrigin.Lease,
+      AcquisitionOrigin.Rental,
+      AcquisitionOrigin.Pledges,
+      AcquisitionOrigin.MosqueBuildingFund,
+      AcquisitionOrigin.RemnantProgramFund,
+      AcquisitionOrigin.InvestmentReturns,
+      AcquisitionOrigin.Grants,
+      AcquisitionOrigin.Other,
+    ] as const),
   };
 }
 export function fakeAssetStatus() {

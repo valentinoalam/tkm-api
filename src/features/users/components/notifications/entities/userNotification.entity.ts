@@ -1,7 +1,10 @@
-import { NotificationStatus } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
-import { User } from '@/features/users/entities';
+import { NotificationStatus } from '@prisma/client';
+
 import { Notification } from './notification.entity';
+
+import { User } from '@/features/users/entities';
+
 export class UserNotification {
   @ApiProperty({
     type: 'string',

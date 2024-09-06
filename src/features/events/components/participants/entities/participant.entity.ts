@@ -1,9 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Profile } from '@/features/users/components/profile/entities';
+
 import { EmergencyContact } from '../emergencyContact/entities';
-import { User } from '@/features/users/entities';
-import { Event } from '@/features/events/entities';
 import { FamilyMember } from '../familyMember/entities';
+
+import { Event } from '@/features/events/entities';
+import { Profile } from '@/features/users/components/profile/entities';
+import { User } from '@/features/users/entities';
 
 export class Participant {
   @ApiProperty({

@@ -1,5 +1,5 @@
-import { Period } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+import { Period } from '@prisma/client';
 
 export class EventDto {
   @ApiProperty({
