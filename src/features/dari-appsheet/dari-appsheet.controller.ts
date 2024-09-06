@@ -37,7 +37,7 @@ import {
 export class DariAppsheetController {
   constructor(private readonly dariAppsheetService: DariAppsheetService) {}
 
-  @Get('transactions')
+  @Get('data-chart')
   getTransactionsDataChart() {
     return this.dariAppsheetService.getTransactionsDataChart();
   }

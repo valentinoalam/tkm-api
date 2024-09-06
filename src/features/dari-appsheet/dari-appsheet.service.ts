@@ -79,6 +79,8 @@ export class DariAppsheetService {
     page?: number,
     limit?: number,
   ) {
+    if(!page) page = 0;
+    if(!limit) limit = 10;
     const filters: any = {};
     if (dateStart) {
       filters.gte = new Date(dateStart);
@@ -120,7 +122,7 @@ export class DariAppsheetService {
       page,
       limit,
     );
-
+    console.log(data);
     data.data = await data.data.map(
       ({ id, dtTransaction, activity, category, value, photo }) => ({
         id,

@@ -14,7 +14,7 @@ export async function getPaginatedData<T>(
   page: number,
   limit: number,
 ): Promise<PaginatedResult<T>> {
-  const skip = (page - 1) * limit;
+  const skip = page * limit;
   const modelClient = client[model];
   const [data, totalRecords] = await Promise.all([
     modelClient.findMany({
