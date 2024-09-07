@@ -42,18 +42,25 @@ export class DariAppsheetController {
     return this.dariAppsheetService.getTransactionsDataChart();
   }
 
+  @Get('data-summary')
+  getTransactionsDataChartCompact() {
+    return this.dariAppsheetService.getChartDataReport();
+  }
+
   @Get('transactions')
   findAllTransactions(
     @Query('startDate') dateStart?: string,
     @Query('endDate') dateEnd?: string,
     @Query('page') page?: number,
     @Query('limit') limit?: number,
+    @Query('search') search?: string,
   ) {
     return this.dariAppsheetService.findAllTransactions(
       dateStart,
       dateEnd,
       page,
       limit,
+      search
     );
   }
 

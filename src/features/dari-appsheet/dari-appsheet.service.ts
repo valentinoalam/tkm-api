@@ -1,5 +1,4 @@
 import path from 'path';
-
 import { Injectable } from '@nestjs/common';
 
 import {
@@ -16,8 +15,13 @@ import { DatabaseService } from '@/core/database/database.service';
 import { getPaginatedData, PaginatedResult } from '@/shared/utils/paginate-data.utils';
 import { Transaction } from './transaction.interface';
 import { AppsheetTransaksi } from './entities/dari-appsheet.entity';
+import { Prisma } from '@prisma/client';
 
 export interface PaginatedTransactionResult extends PaginatedResult<Transaction> {}
+
+const bigIntReplacer = (key, value) => {
+  return typeof value === 'bigint' ? value.toString() : value;
+};
 @Injectable()
 export class DariAppsheetService {
   constructor(private db: DatabaseService) {}
@@ -77,77 +81,104 @@ export class DariAppsheetService {
     return transactionData;
   }
 
+  async getChartDataReport() {
+    const groupedData = await this.db.$queryRaw`
+      SELECT 
+        YEAR(dtTransaction) as year,
+        MONTH(dtTransaction) as month,
+        at.category_id,
+        ak.category as category,
+        ak.type as in_out,
+        ak.color as color,
+        SUM(at.amount) as sum
+      FROM AppsheetTransaksi at
+      JOIN AppsheetKategori ak ON at.category_id = ak.id
+      WHERE at.isDeleted = false
+      GROUP BY year, month, at.category_id
+      ORDER BY year, month;
+    `;
+    const dataOut = JSON.parse(JSON.stringify(groupedData, bigIntReplacer));
+    return dataOut;
+  }
+
   async findAllTransactions(
     dateStart?: string,
     dateEnd?: string,
     page?: number,
     limit?: number,
+    search?: string
   ) {
-    if(!page) page = 0;
-    if(!limit) limit = 10;
-    const filters: any = {};
-    if (dateStart) {
-      filters.gte = new Date(dateStart);
+    const params: (string | number)[] = [];
+    const conditions: string[] = [];
+    
+    // Pagination calculations
+    const offset = (page - 1) * limit;
+
+    if (search) {
+      const searchLike = `%${search}%`; // Use % for SQL LIKE operator
+      conditions.push(`(at.activity LIKE ? OR ak.category LIKE ?)`);
+      params.push(searchLike, searchLike);
     }
-    if (dateEnd) {
-      filters.lte = new Date(dateEnd);
+
+    if (dateStart && dateEnd) {
+      conditions.push(`at.dtTransaction BETWEEN ? AND ?`);
+      params.push(dateStart, dateEnd);
+    } else if (dateEnd) {
+      conditions.push(`at.dtTransaction <= ?`);
+      params.push(dateEnd);
+    } else if (dateStart) {
+      conditions.push(`at.dtTransaction >= ?`);
+      params.push(dateStart);
     }
-    const whereClause =
-      dateStart || dateEnd
-        ? { dtTransaction: filters, isDeleted: false }
-        : { isDeleted: false };
-    const query = {
-      where: whereClause,
-      include: {
-        category: {
-          select: {
-            id: true,
-            category: true, // Include the category name
-            type: true,
-            color: true,
-          },
-        },
-        photo: {
-          select: {
-            name: true,
-            downloadLink: true,
-          },
-        },
-      },
-      orderBy: {
-        dtTransaction: 'desc',
-      },
+
+    // Query to count total records
+    const countQuery = `
+      SELECT COUNT(*)
+      FROM AppsheetTransaksi at
+      JOIN AppsheetKategori ak ON at.category_id = ak.id
+      WHERE at.isDeleted = false
+      ${conditions.length > 0 ? `AND ${conditions.join(' AND ')}` : ''}
+    `;
+
+    // Fetch total records
+    const totalRecordsResult = await this.db.$queryRawUnsafe(countQuery, ...params);
+    const totalRecords =  Number(totalRecordsResult[0]['COUNT(*)']);
+    // Calculate total pages
+    const totalPages = Math.ceil(totalRecords / limit);
+
+    if(limit){ // Adding limit and offset to parameters
+      page = page? page : 0;
+      params.push(limit, offset);
+    }
+
+    const query = `
+      SELECT 
+        at.id,
+        at.dtTransaction,
+        at.activity,
+        ak.category,
+        ak.type,
+        ak.color,
+        at.amount,
+        ap.name AS photo,
+        ap.downloadLink AS downloadLink
+      FROM AppsheetTransaksi at
+      JOIN AppsheetKategori ak ON at.category_id = ak.id
+      LEFT JOIN AppsheetPhoto ap ON at.photoId = ap.id
+      WHERE at.isDeleted = false
+      ${conditions.length > 0 ? `AND ${conditions.join(' AND ')}` : ''}
+      ORDER BY at.dtTransaction DESC
+      ${limit? `LIMIT ? OFFSET ?` : ''}
+    `;
+
+    const results = await this.db.$queryRawUnsafe(query, ...params);
+    
+    return {
+      data: results,
+      totalRecords,
+      totalPages,
+      currentPage: page
     };
-
-    const data = await getPaginatedData<Transaction>(
-      this.db,
-      'appsheetTransaksi',
-      query,
-      page,
-      limit,
-    );
-
-    const dataOut = data.data.map(
-      ({ id, dtTransaction, activity, category, value, photo }) => ({
-        id,
-        dtTransaction,
-        activity,
-        categoryId: category.id,
-        category: category.category,
-        color: category.color,
-        in_out: category.type,
-        value,
-        photo: photo ? photo.name : null,
-        downloadLink: photo ? photo.downloadLink : null,
-      })
-    );
-    const result = {
-      totalRecords: data.totalRecords,
-      totalPages: data.totalPages,
-      currentPage: data.currentPage,
-      data: dataOut
-    }
-    return result;
   }
 
   async getMonthlyBalanceReport(month: number, year: number) {
