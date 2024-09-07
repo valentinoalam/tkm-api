@@ -86,7 +86,6 @@ export class DariAppsheetService {
       SELECT 
         YEAR(dtTransaction) as year,
         MONTH(dtTransaction) as month,
-        at.category_id,
         ak.category as category,
         ak.type as in_out,
         ak.color as color,
