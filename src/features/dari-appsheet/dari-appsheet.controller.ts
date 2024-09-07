@@ -66,6 +66,14 @@ export class DariAppsheetController {
   showAllNotaImage() {
     return this.dariAppsheetService.showAllNotaImage();
   }
+
+  @Get('balance')
+  getMonthlyReport(    
+    @Query('month') month: number,
+    @Query('year') year: number,
+  ) {
+    return this.dariAppsheetService.getMonthlyBalanceReport(month, year);
+  }
   @Get('transactions/:id')
   findOneTransaction(@Param('id') id: string) {
     return this.dariAppsheetService.findOneTransaction(id);

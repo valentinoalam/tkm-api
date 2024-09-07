@@ -13,8 +13,11 @@ import {
 } from './dto/update-dari-appsheet.dto';
 
 import { DatabaseService } from '@/core/database/database.service';
-import { getPaginatedData } from '@/shared/utils/paginate-data.utils';
+import { getPaginatedData, PaginatedResult } from '@/shared/utils/paginate-data.utils';
+import { Transaction } from './transaction.interface';
+import { AppsheetTransaksi } from './entities/dari-appsheet.entity';
 
+export interface PaginatedTransactionResult extends PaginatedResult<Transaction> {}
 @Injectable()
 export class DariAppsheetService {
   constructor(private db: DatabaseService) {}
@@ -73,6 +76,7 @@ export class DariAppsheetService {
     );
     return transactionData;
   }
+
   async findAllTransactions(
     dateStart?: string,
     dateEnd?: string,
@@ -115,15 +119,15 @@ export class DariAppsheetService {
       },
     };
 
-    const data = await getPaginatedData(
+    const data = await getPaginatedData<Transaction>(
       this.db,
       'appsheetTransaksi',
       query,
       page,
       limit,
     );
-    console.log(data);
-    data.data = await data.data.map(
+
+    const dataOut = data.data.map(
       ({ id, dtTransaction, activity, category, value, photo }) => ({
         id,
         dtTransaction,
@@ -135,9 +139,45 @@ export class DariAppsheetService {
         value,
         photo: photo ? photo.name : null,
         downloadLink: photo ? photo.downloadLink : null,
-      }),
+      })
     );
-    return data;
+    const result = {
+      totalRecords: data.totalRecords,
+      totalPages: data.totalPages,
+      currentPage: data.currentPage,
+      data: dataOut
+    }
+    return result;
+  }
+
+  async getMonthlyBalanceReport(month: number, year: number) {
+    const groupedTransactions = await this.db.appsheetTransaksi.groupBy({
+      by: ['categoryId'],
+      where: {
+        dtTransaction: {
+          gte: new Date(year, month - 1, 1),
+          lte: new Date(year, month, 0),
+        },
+      },
+      _sum: {
+        value: true,
+      },
+    });
+      // Fetch related category data for each group
+    const resultWithCategory = await Promise.all(
+      groupedTransactions.map(async (group) => {
+        const category = await this.db.appsheetKategori.findUnique({
+          where: { id: group.categoryId },
+        });
+        return {
+          sum: group._sum.value,
+          categoryName: category?.category || 'Unknown',
+          type: category?.type || 'Unknown',
+        };
+      })
+    );
+
+    return resultWithCategory;
   }
 
   async findAllCategories() {
