@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { Prisma, TransactionType } from '@prisma/client';
 import {
   IsDateString,
@@ -7,6 +7,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+import { CreateAppsheetKategoriDto } from './create-dari-appsheet.dto';
 
 export class UpdateAppsheetTransaksiDto {
   @ApiProperty({
@@ -58,29 +59,7 @@ export class UpdateAppsheetTransaksiDto {
   dtTransaction?: Date;
 }
 
-export class UpdateAppsheetKategoriDto {
-  @ApiProperty({
-    enum: TransactionType,
-    required: false,
-  })
-  @IsOptional()
-  type?: TransactionType;
-  @ApiProperty({
-    type: 'string',
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  category?: string;
-  @ApiProperty({
-    type: 'string',
-    required: false,
-    nullable: true,
-  })
-  @IsOptional()
-  @IsString()
-  color?: string | null;
-}
+export class UpdateAppsheetKategoriDto extends PartialType(CreateAppsheetKategoriDto) {}
 
 export class UpdateAppsheetPhotoDto {
   @ApiProperty({

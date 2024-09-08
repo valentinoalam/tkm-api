@@ -16,21 +16,21 @@ export default class SwaggerDocumentation {
       .setTitle(configItem.get('app.name'))
       .setDescription(configItem.get('app.swaggerDescription'))
       .setVersion('0.1')
-      .addBearerAuth(
-        {
-          type: 'http',
-          // scheme: 'bearer',
-          bearerFormat: 'JWT',
-          in: 'header',
-        },
-        'access-token',
-      )
-      .addSecurity('ApiKeyAuth', {
-        type: 'apiKey',
-        in: 'header',
-        name: 'X-API-KEY',
-      })
-      .addTag('DNS')
+      // .addBearerAuth(
+      //   {
+      //     type: 'http',
+      //     // scheme: 'bearer',
+      //     bearerFormat: 'JWT',
+      //     in: 'header',
+      //   },
+      //   'access-token',
+      // )
+      // .addSecurity('ApiKeyAuth', {
+      //   type: 'apiKey',
+      //   in: 'header',
+      //   name: 'X-API-KEY',
+      // })
+      // .addTag('DNS')
       // .addSecurityRequirements('ApiKeyAuth')
       .build();
 

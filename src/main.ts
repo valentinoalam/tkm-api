@@ -25,11 +25,6 @@ async function bootstrap() {
     });
   }
 
-  if (config.get('app.swaggerEnabled')) {
-    const swaggerDoc = new SwaggerDocumentation(app);
-    swaggerDoc.serve();
-  }
-
   app.setGlobalPrefix('api');
   app.useGlobalPipes(
     new ValidationPipe({
@@ -48,7 +43,11 @@ async function bootstrap() {
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
   const prismaService = app.get(DatabaseService);
   await prismaService.enableShutdownHooks(app);
-
+  
+  if (config.get('app.swaggerEnabled')) {
+    const swaggerDoc = new SwaggerDocumentation(app);
+    swaggerDoc.serve();
+  }
   const port = process.env.PORT || 6001;
   await app.listen(port);
   logger.log('server run on ' + port);
