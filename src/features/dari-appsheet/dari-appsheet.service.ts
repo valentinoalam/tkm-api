@@ -84,20 +84,66 @@ export class DariAppsheetService {
   async getChartDataReport() {
     const groupedData = await this.db.$queryRaw`
       SELECT 
-        YEAR(dtTransaction) as year,
-        MONTH(dtTransaction) as month,
-        ak.category as category,
-        ak.type as in_out,
-        ak.color as color,
-        SUM(at.amount) as sum
+        YEAR(at.dtTransaction) AS year,
+        MONTH(at.dtTransaction) AS month,
+        ak.category AS category,
+        ak.type AS in_out,
+        ak.color AS color,
+        SUM(at.amount) AS sum
       FROM AppsheetTransaksi at
       JOIN AppsheetKategori ak ON at.category_id = ak.id
       WHERE at.isDeleted = false
-      GROUP BY year, month, at.category_id
-      ORDER BY year, month;
+      GROUP BY 
+        YEAR(at.dtTransaction),
+        MONTH(at.dtTransaction),
+        ak.category,
+        ak.type,
+        ak.color
+      ORDER BY 
+        YEAR(at.dtTransaction),
+        MONTH(at.dtTransaction);
     `;
-    const dataOut = JSON.parse(JSON.stringify(groupedData, bigIntReplacer));
-    return dataOut;
+  
+
+    const dataParsed = JSON.parse(JSON.stringify(groupedData, bigIntReplacer));
+    // Process the data to aggregate sums by month for each year
+    const months = Array.from(new Set(dataParsed.map(item=>item.month)));
+
+    const aggregatedData = dataParsed.reduce((acc, { month, sum, category, in_out, color }) => {
+      // Ensure category exists in accumulator
+      acc[category] = acc[category] || {};
+    
+      // Utilize a single array per category (no year needed)
+      const categoryData = acc[category];
+      const monthIndex = months.indexOf(month); // Get month index
+    
+      // Check if month exists and initialize if necessary
+      if (!categoryData[monthIndex]) {
+        categoryData[monthIndex] = { in: 0, out: 0 };
+      }
+      if (in_out === 'Penerimaan') {
+        categoryData[monthIndex].in = sum || 0; // month - 1 for zero-based index
+      } else if (in_out === 'Pengeluaran') {
+        categoryData[monthIndex].out = sum || 0; // month - 1 for zero-based index
+      }
+      categoryData.color = color
+      return acc;
+    }, {});
+    // Convert the aggregated data into the desired format
+    const result = [];
+    for (const [category, monthData] of Object.entries(aggregatedData)) {
+      const inData = [];
+      const outData = [];
+  
+      for (let month = 0; month < months.length; month++) {
+        inData.push(monthData[month]?.in || 0);
+        outData.push(monthData[month]?.out || 0);
+      }
+  
+      result.push({ name: `in${category}`, data: inData, group: "Penerimaan", color: monthData["color"] });
+      result.push({ name: `out${category}`, data: outData, group: "Pengeluaran", color: monthData["color"]  });
+    }
+    return {result, months};
   }
 
   async findAllTransactions(
