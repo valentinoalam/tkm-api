@@ -6,7 +6,7 @@ import {
   Delete,
   Query,
   Post,
-  Put,
+  Patch,
   HttpCode,
   HttpStatus,
   UploadedFile,
@@ -91,11 +91,6 @@ export class DariAppsheetController {
     return this.dariAppsheetService.findOneCategory(id);
   }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateDariAppsheetDto: UpdateDariAppsheetDto) {
-  //   return this.dariAppsheetService.update(id, updateDariAppsheetDto);
-  // }
-
   @ApiOperation({
     summary: 'Create a transaction',
   })
@@ -124,7 +119,7 @@ export class DariAppsheetController {
     return await this.dariAppsheetService.createKategori(data);
   }
 
-  @Put('transaksi/:id')
+  @Patch('transaksi/:id')
   @ApiOperation({
     summary: 'Update a user',
   })
@@ -142,7 +137,7 @@ export class DariAppsheetController {
     return await this.dariAppsheetService.updateTransaksi(id, data, file);
   }
 
-  @Put('kategori/:id')
+  @Patch('kategori/:id')
   async updateKategori(
     @Param('id') id: string,
     @Body() data: UpdateAppsheetKategoriDto,
@@ -150,7 +145,7 @@ export class DariAppsheetController {
     return await this.dariAppsheetService.updateKategori(id, data);
   }
 
-  @Put('photo/:id')
+  @Patch('photo/:id')
   async updatePhotoData(
     @Param('id') id: string,
     @Body() data: UpdateAppsheetPhotoDto,
