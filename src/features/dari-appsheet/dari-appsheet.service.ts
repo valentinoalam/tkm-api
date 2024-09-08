@@ -201,6 +201,7 @@ export class DariAppsheetService {
         at.id,
         at.dtTransaction,
         at.activity,
+        at.category_id AS categoryId
         ak.category,
         ak.type,
         ak.color,
