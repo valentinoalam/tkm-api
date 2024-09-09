@@ -1,8 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Prisma, TransactionType } from '@prisma/client';
+import { Transform } from 'class-transformer';
 import {
   IsDateString,
   IsDecimal,
+  IsISO8601,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -28,10 +30,19 @@ export class CreateAppsheetTransaksiDto {
   })
   @IsNotEmpty()
   @IsDateString()
+  @ApiProperty({ type: 'string', description: 'Transaction Date in ISO 8601 format' })
+  @IsISO8601()
+  @Transform(({ value }) => new Date(value).toISOString(), { toClassOnly: true })
   dtTransaction: Date;
   @IsNotEmpty()
   @IsString()
   categoryId: string;
+  
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+  })
+  file?: Express.Multer.File;
 }
 
 export class CreateAppsheetPhotoDto {

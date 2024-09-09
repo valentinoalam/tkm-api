@@ -57,6 +57,7 @@ export class UpdateAppsheetTransaksiDto {
   @IsOptional()
   @IsDateString()
   dtTransaction?: Date;
+  file?: Express.Multer.File;
 }
 
 export class UpdateAppsheetKategoriDto extends PartialType(CreateAppsheetKategoriDto) {}

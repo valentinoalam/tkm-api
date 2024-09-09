@@ -1,4 +1,6 @@
-import path from 'path';
+import * as path from 'path';
+import * as sharp from 'sharp';
+
 import { Injectable } from '@nestjs/common';
 
 import {
@@ -279,13 +281,13 @@ export class DariAppsheetService {
     let transaksi;
 
     if (file) {
-      const originalFilePath = file.path;
+      const originalFilePath = path.resolve(file.path);
       const thumbnailFilePath = path.join(
         path.dirname(originalFilePath),
         'small/' + file.filename,
       );
+      console.log(file)
       // Process the image to create a thumbnail
-      const sharp = require('sharp');
       await sharp(originalFilePath)
         .resize(200) // Resize to a width of 200px while maintaining aspect ratio
         .toFile(thumbnailFilePath);
@@ -331,13 +333,12 @@ export class DariAppsheetService {
   ) {
     let transaksi;
     if (file) {
-      const originalFilePath = file.path;
+      const originalFilePath = path.resolve(file.path);
       const thumbnailFilePath = path.join(
         path.dirname(originalFilePath),
         'small/' + file.filename,
       );
       // Process the image to create a thumbnail
-      const sharp = require('sharp');
       await sharp(originalFilePath)
         .resize(200) // Resize to a width of 200px while maintaining aspect ratio
         .toFile(thumbnailFilePath);

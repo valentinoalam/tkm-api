@@ -32,6 +32,9 @@ import {
   UpdateAppsheetKategoriDto,
   UpdateAppsheetPhotoDto,
 } from './dto/update-dari-appsheet.dto';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
+import { multerOptions } from '@/core/config/multer.config';
 
 @Controller('dari-appsheet')
 export class DariAppsheetController {
@@ -91,6 +94,7 @@ export class DariAppsheetController {
     return this.dariAppsheetService.findOneCategory(id);
   }
 
+  @Post('transaksi')
   @ApiOperation({
     summary: 'Create a transaction',
   })
@@ -104,9 +108,8 @@ export class DariAppsheetController {
   @ApiForbiddenResponse({
     description: 'transaction already exists',
   })
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file', multerOptions))
   @HttpCode(HttpStatus.CREATED)
-  @Post('transaksi')
   async createTransaksi(
     @Body() data: CreateAppsheetTransaksiDto,
     @UploadedFile() file: Express.Multer.File,
@@ -119,6 +122,26 @@ export class DariAppsheetController {
     return await this.dariAppsheetService.createKategori(data);
   }
 
+  @UseInterceptors(FileInterceptor('image', {
+    storage: diskStorage({
+      destination: './uploads', // Folder where images will be stored
+      filename: (req, file, cb) => {
+        // Create a unique filename
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+        const ext = extname(file.originalname); // Extract file extension
+        cb(null, `${uniqueSuffix}${ext}`);
+      },
+    }),
+  }))
+  @Post('photo')
+  async uploadPhoto(@UploadedFile() file: Express.Multer.File) {
+    console.log('File received:', file);
+    return {
+      message: 'File uploaded successfully',
+      filePath: `/uploads/${file.filename}`,
+    };
+  }
+
   @Patch('transaksi/:id')
   @ApiOperation({
     summary: 'Update a user',
@@ -128,7 +151,7 @@ export class DariAppsheetController {
   @ApiBadRequestResponse({
     description: 'Some character error or type error',
   })
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file', multerOptions))
   async updateTransaksi(
     @Param('id') id: string,
     @Body() data: UpdateAppsheetTransaksiDto,

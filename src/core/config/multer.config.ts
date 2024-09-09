@@ -5,18 +5,18 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 import { Request } from 'express';
 import { diskStorage } from 'multer';
 import { v4 as uuid } from 'uuid';
-
+import * as path from 'path';
 // Multer configuration
 export const multerConfig = {
-  dest: process.env.UPLOAD_LOCATION,
+  dest: path.resolve(process.cwd(), '..', process.env.UPLOAD_LOCATION),
 };
 
 // Multer upload options
 export const multerOptions = {
   // Enable file size limits
-  limits: {
-    fileSize: +process.env.MAX_FILE_SIZE,
-  },
+  // limits: {
+  //   fileSize: +process.env.MAX_FILE_SIZE,
+  // },
   // Check the mimetypes to allow for upload
   fileFilter: (req: any, file: Express.Multer.File, cb: any) => {
     if (file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {

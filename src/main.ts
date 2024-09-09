@@ -37,8 +37,7 @@ async function bootstrap() {
     }),
   );
   app.useGlobalFilters(
-    new PrismaClientExceptionFilter(httpAdapter),
-    new AuthExceptionsFilter(),
+    new PrismaClientExceptionFilter(httpAdapter)
   );
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
   const prismaService = app.get(DatabaseService);
