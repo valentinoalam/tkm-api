@@ -44,10 +44,10 @@ import { DariAppsheetModule } from './dari-appsheet/dari-appsheet.module';
     GoogleModule,
   ],
   providers: [
-    {
-      provide: APP_GUARD,
-      useClass: AtGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: AtGuard,
+    // },
   ],
 })
 export class FeaturesModule {}

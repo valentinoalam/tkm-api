@@ -22,6 +22,7 @@ export class AtGuard extends AuthGuard('jwt-access') implements CanActivate {
       route.path.includes('/auth/signin') ||
       route.path.includes('/auth/signup') ||
       route.path.includes('/auth/refresh') ||
+      /\/[^/]+\/fake-it/.test(route.path) ||
       isPublic
     ) {
       return true;
