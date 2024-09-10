@@ -47,16 +47,16 @@ export class AuthController {
     try {
       const user = await this.authService.getIAM(req.user['sub']);
 
-      const { name, profilePic, position, phone, address } = user.profile;
+      // const { name, profilePic, position, phone, address } = user.profile;
       const { username, email } = user;
       dataOut.data.user = {
         username,
         email,
-        name,
-        profilePic,
-        position,
-        phone,
-        address,
+        // name,
+        // profilePic,
+        // position,
+        // phone,
+        // address,
       };
     } catch (error) {
       dataOut.status = false;
@@ -71,7 +71,6 @@ export class AuthController {
   }
 
   @Post('signin')
-  // @UseGuards(AuthGuard('ldap'))
   @ApiOperation({
     summary: 'User login API',
   })
@@ -97,24 +96,13 @@ export class AuthController {
 
     try {
       const { tokens, user } = await this.authService.signin(dto);
-      const { name, profilePic, division, position, phone, doB, alamat } =
-        user.profile;
-      const { id, username, email, userRole } = user;
+      const { id, username, email } = user;
       dataOut.data.tokens = tokens;
       dataOut.data.user = user;
       dataOut.data.user = {
         id,
         username,
         email,
-        role: userRole.name,
-        access: userRole.permissions,
-        name,
-        profilePic,
-        division,
-        position,
-        phone,
-        doB,
-        alamat,
       };
       dataOut.message = 'Signed in successfully.';
     } catch (error) {

@@ -33,15 +33,15 @@ export class AuthService {
         username: true,
         email: true,
         hashedPassword: true,
-        profile: {
-          select: {
-            name: true,
-            profilePic: true,
-            phone: true,
-            position: true,
-            address: true,
-          },
-        },
+        // profile: {
+        //   select: {
+        //     name: true,
+        //     profilePic: true,
+        //     phone: true,
+        //     position: true,
+        //     address: true,
+        //   },
+        // },
       },
     });
 

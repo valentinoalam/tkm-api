@@ -28,16 +28,7 @@ export class AtStrategy extends PassportStrategy(Strategy, 'jwt-access') {
     return null;
   }
 
-  async validate(req: Request, payload: JwtPayload) {
-    const user = await this.db.user.findUnique({
-      where: { id: payload.sub },
-      select: {
-        id: true,
-        username: true,
-        email: true,
-      },
-    });
-    req.user = user;
-    return user;
+  async validate(payload: JwtPayload) {
+    return payload;
   }
 }

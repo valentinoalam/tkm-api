@@ -1,10 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { UserNotification } from '../components/notifications/entities';
-import { Position } from '../components/position/entities';
-import { Profile } from '../components/profile/entities';
+// import { UserNotification } from '../components/notifications/entities';
+// import { Position } from '../components/position/entities';
+// import { Profile } from '../components/profile/entities';
 
-import { Participant } from '@/features/events/components/participants/entities';
+// import { Participant } from '@/features/events/components/participants/entities';
 
 export class User {
   @ApiProperty({
@@ -44,28 +44,28 @@ export class User {
     nullable: true,
   })
   updatedAt: Date | null;
-  @ApiProperty({
-    type: () => Profile,
-    required: false,
-    nullable: true,
-  })
-  profile?: Profile | null;
-  @ApiProperty({
-    type: () => UserNotification,
-    isArray: true,
-    required: false,
-  })
-  userNotification?: UserNotification[];
-  @ApiProperty({
-    type: () => Position,
-    isArray: true,
-    required: false,
-  })
-  position?: Position[];
-  @ApiProperty({
-    type: () => Participant,
-    isArray: true,
-    required: false,
-  })
-  participant?: Participant[];
+  // @ApiProperty({
+  //   type: () => Profile,
+  //   required: false,
+  //   nullable: true,
+  // })
+  // profile?: Profile | null;
+  // @ApiProperty({
+  //   type: () => UserNotification,
+  //   isArray: true,
+  //   required: false,
+  // })
+  // userNotification?: UserNotification[];
+  // @ApiProperty({
+  //   type: () => Position,
+  //   isArray: true,
+  //   required: false,
+  // })
+  // position?: Position[];
+  // @ApiProperty({
+  //   type: () => Participant,
+  //   isArray: true,
+  //   required: false,
+  // })
+  // participant?: Participant[];
 }

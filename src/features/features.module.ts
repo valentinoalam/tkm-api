@@ -4,11 +4,11 @@ import { Module } from '@nestjs/common';
 // import { JournalModule } from '../features/journal/journal.module';
 // import { VendorModule } from '../features/vendor/vendor.module';
 // import { MediaModule } from '../features/media/media.module';
-// import { UsersModule } from '../features/users/users.module';
+import { UsersModule } from '../features/users/users.module';
 // import { FilesModule } from 'src/shared/files/files.module';
-// import { APP_GUARD } from '@nestjs/core';
-// import { AtGuard } from '@common/guards';
-// import { AuthModule } from './auth/auth.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AtGuard } from '@common/guards';
+import { AuthModule } from './auth/auth.module';
 // import { NotificationModule } from './notification/notification.module';
 // import { EventsModule } from './events/events.module';
 // import { AssetsModule } from './assets/assets.module';
@@ -20,10 +20,10 @@ import { DariAppsheetModule } from './dari-appsheet/dari-appsheet.module';
 @Module({
   imports: [
     // FilesModule,
-    // AuthModule,
+    AuthModule,
     // VendorModule,
     // MediaModule,
-    // UsersModule,
+    UsersModule,
 
     // NotificationModule,
     // EventsModule,
@@ -40,14 +40,14 @@ import { DariAppsheetModule } from './dari-appsheet/dari-appsheet.module';
     // VendorModule,
     // MediaModule,
     // FilesModule,
-    // UsersModule,
+    UsersModule,
     GoogleModule,
   ],
   providers: [
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: AtGuard,
-    // },
+    {
+      provide: APP_GUARD,
+      useClass: AtGuard,
+    },
   ],
 })
 export class FeaturesModule {}

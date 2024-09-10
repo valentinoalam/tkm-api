@@ -51,6 +51,27 @@ export class UsersController {
     return dataOut;
   }
 
+  @Post('user')
+  async createUser() {
+    const dataOut = {
+      status: true,
+      message: '',
+      data: {
+        user: null,
+      },
+      logs: {},
+    };
+    try {
+      const user = await this.usersService.createFakeData();
+      dataOut.data.user = user;
+    } catch (error) {
+      dataOut.status = false;
+      dataOut.message = error.message;
+      dataOut.logs = { ...dataOut.logs, error };
+    }
+    return dataOut;
+  }
+  
   @Get('iam')
   async getIAM(@Req() req: Request) {
     const dataOut = {
@@ -238,16 +259,16 @@ export class UsersController {
         userId,
       );
 
-      const { name, profilePic, position, phone, address } = user.profile;
+      // const { name, profilePic, position, phone, address } = user.profile;
       const { username, email } = user;
       dataOut.data.user = {
         username,
         email,
-        name,
-        profilePic,
-        position,
-        phone,
-        address,
+        // name,
+        // profilePic,
+        // position,
+        // phone,
+        // address,
       };
     } catch (error) {
       dataOut.status = false;

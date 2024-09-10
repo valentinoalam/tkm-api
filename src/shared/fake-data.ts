@@ -1,6 +1,5 @@
 import { faker } from '@faker-js/faker';
 import {
-  NotificationStatus,
   Boundary,
   TransactionType,
   ProgramStatus,
@@ -32,58 +31,7 @@ export function fakeNotificationComplete() {
     sentAt: faker.date.anytime(),
   };
 }
-export function fakeUserNotification() {
-  return {
-    status: faker.helpers.arrayElement([
-      NotificationStatus.Pending,
-      NotificationStatus.Sent,
-      NotificationStatus.Failed,
-      NotificationStatus.Delivered,
-      NotificationStatus.Readed,
-    ] as const),
-  };
-}
-export function fakeUserNotificationComplete() {
-  return {
-    id: faker.string.uuid(),
-    userId: faker.string.uuid(),
-    notification_id: faker.string.uuid(),
-    status: faker.helpers.arrayElement([
-      NotificationStatus.Pending,
-      NotificationStatus.Sent,
-      NotificationStatus.Failed,
-      NotificationStatus.Delivered,
-      NotificationStatus.Readed,
-    ] as const),
-  };
-}
-export function fakeProfile() {
-  return {
-    name: faker.person.fullName(),
-    profilePic: undefined,
-    phone: undefined,
-    address: undefined,
-    position: faker.lorem.words(5),
-    userCreated: undefined,
-    userModified: undefined,
-    dtModified: undefined,
-  };
-}
-export function fakeProfileComplete() {
-  return {
-    id: faker.string.uuid(),
-    userId: faker.string.uuid(),
-    name: faker.person.fullName(),
-    profilePic: undefined,
-    phone: undefined,
-    address: undefined,
-    position: faker.lorem.words(5),
-    userCreated: undefined,
-    userModified: undefined,
-    dtCreated: new Date(),
-    dtModified: undefined,
-  };
-}
+
 export function fakeUser() {
   return {
     email: undefined,

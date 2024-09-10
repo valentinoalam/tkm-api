@@ -16,22 +16,17 @@ export default class SwaggerDocumentation {
       .setTitle(configItem.get('app.name'))
       .setDescription(configItem.get('app.swaggerDescription'))
       .setVersion('0.1')
-      // .addBearerAuth(
-      //   {
-      //     type: 'http',
-      //     // scheme: 'bearer',
-      //     bearerFormat: 'JWT',
-      //     in: 'header',
-      //   },
-      //   'access-token',
-      // )
-      // .addSecurity('ApiKeyAuth', {
-      //   type: 'apiKey',
-      //   in: 'header',
-      //   name: 'X-API-KEY',
-      // })
-      // .addTag('DNS')
-      // .addSecurityRequirements('ApiKeyAuth')
+      .addBearerAuth(
+        {
+          type: 'http',
+          // scheme: 'bearer',
+          bearerFormat: 'JWT',
+          in: 'header',
+        },
+        'access-token',
+      )
+      .addTag('DNS')
+      .addSecurityRequirements('access-token')
       .build();
 
     const document = SwaggerModule.createDocument(this.app, config);

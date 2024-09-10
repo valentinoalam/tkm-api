@@ -11,8 +11,8 @@ import {
 import { Prisma } from '@prisma/client';
 import { hash, verify } from 'argon2';
 
-import { UpdateProfileDto, CreateProfileDto } from '../components/profile/dto';
-import { Profile } from '../components/profile/entities/profile.entity';
+// import { UpdateProfileDto, CreateProfileDto } from '../components/profile/dto';
+// import { Profile } from '../components/profile/entities/profile.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { User as UserEntity } from '../entities/user.entity';
@@ -25,7 +25,7 @@ export class UsersService {
 
   async createFakeData(): Promise<any> {
     const fakeUser = fakeData.fakeUser(); // Generate 10 fake users
-    const fakeProfile = fakeData.fakeProfile();
+    // const fakeProfile = fakeData.fakeProfile();
     const data = await fs.promises.readFile('users.json', 'utf8');
     const newUser =
       fakeUser.username + ', password: ' + fakeUser.hashedPassword;
@@ -46,16 +46,16 @@ export class UsersService {
     const user = await this.db.user.create({
       data: {
         ...fakeUser,
-        profile: {
-          create: { ...fakeProfile },
-        },
+        // profile: {
+        //   create: { ...fakeProfile },
+        // },
       },
-      include: { profile: true },
+      // include: { profile: true },
     });
     return user;
   }
 
-  async create(dto: CreateUserDto, profileDto: CreateProfileDto): Promise<any> {
+  async create(dto: CreateUserDto): Promise<any> {
     // generate the password hash
     const { username, email } = dto;
     let user = await this.db.user.findFirst({ where: { username } });
@@ -69,17 +69,17 @@ export class UsersService {
         data: {
           username: username,
           email: email,
-          profile: {
-            create: {
-              name: profileDto.name,
-              position: profileDto.position,
-              phone: profileDto.phone,
-              address: profileDto.address,
-            },
-          },
+          // profile: {
+          //   create: {
+          //     name: profileDto.name,
+          //     position: profileDto.position,
+          //     phone: profileDto.phone,
+          //     address: profileDto.address,
+          //   },
+          // },
           hashedPassword: hashedPassword,
         },
-        include: { profile: true },
+        // include: { profile: true },
       })
       .catch((error) => {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -117,9 +117,9 @@ export class UsersService {
     // const decodedUserInfo = req.user as { id: string; email: string };
     const user = await this.db.user.findUnique({
       where: { id },
-      include: {
-        profile: true,
-      },
+      // include: {
+      //   profile: true,
+      // },
     });
     if (!user) {
       throw new NotFoundException();
@@ -134,9 +134,9 @@ export class UsersService {
   async getAll(): Promise<any[]> {
     const records = await this.db.user.findMany({
       // select: { id: true, email: true },
-      include: {
-        profile: true,
-      },
+      // include: {
+      //   profile: true,
+      // },
       orderBy: [
         {
           createdAt: 'desc',
@@ -151,9 +151,9 @@ export class UsersService {
 
   async getAllDeleted(): Promise<any[]> {
     const records = await this.db.user.findMany({
-      include: {
-        profile: true,
-      },
+      // include: {
+      //   profile: true,
+      // },
     });
 
     return records;
@@ -163,9 +163,9 @@ export class UsersService {
     // find the user by username
     const user = await this.db.user.findUnique({
       where: { id },
-      include: {
-        profile: true,
-      },
+      // include: {
+      //   profile: true,
+      // },
     });
 
     return user;
@@ -177,9 +177,9 @@ export class UsersService {
         ...query.where,
         AND: [{ isDeleted: false }],
       },
-      include: {
-        profile: true,
-      },
+      // include: {
+      //   profile: true,
+      // },
     });
     return record;
   }
@@ -190,9 +190,9 @@ export class UsersService {
         ...query.where,
         AND: [{ isDeleted: false }],
       },
-      include: {
-        profile: true,
-      },
+      // include: {
+      //   profile: true,
+      // },
     });
     return records;
   }
@@ -203,9 +203,9 @@ export class UsersService {
         ...query.where,
         AND: [{ isDeleted: true }],
       },
-      include: {
-        profile: true,
-      },
+      // include: {
+      //   profile: true,
+      // },
     });
     return record;
   }
@@ -216,9 +216,9 @@ export class UsersService {
         ...query.where,
         AND: [{ isDeleted: true }],
       },
-      include: {
-        profile: true,
-      },
+      // include: {
+      //   profile: true,
+      // },
     });
 
     return records;
@@ -240,7 +240,7 @@ export class UsersService {
 
     const filteredUserDto: Partial<UserEntity> = {};
 
-    let filteredProfileDto: Partial<Profile> = {};
+    // let filteredProfileDto: Partial<Profile> = {};
 
     for (const prop in dto) {
       if (dto[prop]) {
@@ -248,22 +248,22 @@ export class UsersService {
       }
     }
     for (const prop in filteredDto) {
-      if (profileDto.includes(prop)) {
-        filteredProfileDto[prop] = filteredDto[prop];
-      } else {
+      // if (profileDto.includes(prop)) {
+      //   filteredProfileDto[prop] = filteredDto[prop];
+      // } else {
         filteredUserDto[prop] = filteredDto[prop];
-      }
+      // }
     }
 
-    filteredProfileDto = {
-      ...filteredProfileDto,
-      userModified: userId,
-      dtModified: new Date(),
-    };
+    // filteredProfileDto = {
+    //   ...filteredProfileDto,
+    //   userModified: userId,
+    //   dtModified: new Date(),
+    // };
 
-    if (file) {
-      filteredProfileDto.profilePic = file.filename;
-    }
+    // if (file) {
+    //   filteredProfileDto.profilePic = file.filename;
+    // }
 
     updateData = {
       ...updateData,
@@ -276,28 +276,28 @@ export class UsersService {
         where: { id: id },
         data: {
           ...updateData,
-          profile: {
-            update: {
-              name: filteredProfileDto.name,
-              profilePic: filteredProfileDto.profilePic,
-              phone: filteredProfileDto.phone,
-              address: filteredProfileDto.address,
-              position: filteredProfileDto.position,
-            },
-          },
-          userNotification: {
-            // Update logic for user notifications
-          },
-          position: {
-            // Update logic for positions
-          },
-          participant: {
-            // Update logic for participants
-          },
+          // profile: {
+          //   update: {
+          //     name: filteredProfileDto.name,
+          //     profilePic: filteredProfileDto.profilePic,
+          //     phone: filteredProfileDto.phone,
+          //     address: filteredProfileDto.address,
+          //     position: filteredProfileDto.position,
+          //   },
+          // },
+          // userNotification: {
+          //   // Update logic for user notifications
+          // },
+          // position: {
+          //   // Update logic for positions
+          // },
+          // participant: {
+          //   // Update logic for participants
+          // },
         },
-        include: {
-          profile: true,
-        },
+        // include: {
+        //   profile: true,
+        // },
       })
       .catch((error) => {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -311,25 +311,26 @@ export class UsersService {
     return updatedUser;
   }
 
-  async updateUserProfile(
-    userId: string,
-    dto: UpdateProfileDto,
-  ): Promise<Profile> {
-    try {
-      return await this.db.profile.update({
-        where: {
-          userId: userId,
-        },
-        data: {
-          ...dto,
-        },
-      });
-    } catch (err) {
-      if (err?.code === 'P2025') {
-        throw new NotFoundException(`Record ${userId} to update not found`);
-      }
-    }
-  }
+  // async updateUserProfile(
+  //   userId: string,
+  //   dto: UpdateProfileDto,
+  // ): Promise<Profile> {
+  //   try {
+  //     return await this.db.profile.update({
+  //       where: {
+  //         userId: userId,
+  //       },
+  //       data: {
+  //         ...dto,
+  //       },
+  //     });
+  //   } catch (err) {
+  //     if (err?.code === 'P2025') {
+  //       throw new NotFoundException(`Record ${userId} to update not found`);
+  //     }
+  //   }
+  // }
+
   async deleteById(id: string, userId: string) {
     const user = await this.db.user.delete({
       where: { id },
