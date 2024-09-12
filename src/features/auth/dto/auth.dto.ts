@@ -20,14 +20,6 @@ export class SigninDto {
   @IsEmail()
   @IsOptional()
   email: string;
-  @ApiPropertyOptional({
-    description: 'Nomor Induk Kepegawaian anda',
-    example: '2021010024001',
-  })
-  @IsString()
-  @IsOptional()
-  nik: string;
-
   @ApiProperty({ description: 'Masukan password', example: '12345678' })
   @IsString()
   @IsNotEmpty()

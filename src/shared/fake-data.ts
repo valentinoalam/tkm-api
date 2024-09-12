@@ -34,7 +34,7 @@ export function fakeNotificationComplete() {
 
 export function fakeUser() {
   return {
-    email: undefined,
+    email: faker.internet.email(),
     username: faker.internet.userName(),
     hashedPassword: faker.lorem.words(5),
     hashedRT: undefined,
