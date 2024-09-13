@@ -269,6 +269,7 @@ export class UsersService {
       ...updateData,
       ...filteredUserDto,
       updatedAt: new Date(),
+      
     };
 
     const updatedUser = await this.db.user

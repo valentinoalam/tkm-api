@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Role } from '@prisma/client';
 
 // import { UserNotification } from '../components/notifications/entities';
 // import { Position } from '../components/position/entities';
@@ -30,9 +31,11 @@ export class User {
   })
   hashedRT: string | null;
   @ApiProperty({
-    type: 'boolean',
+    type: 'string',
+    format: 'date-time',
+    nullable: true,
   })
-  isConfirmed: boolean;
+  lastActive: Date | null;
   @ApiProperty({
     type: 'string',
     format: 'date-time',
@@ -44,24 +47,16 @@ export class User {
     nullable: true,
   })
   updatedAt: Date | null;
-  // @ApiProperty({
-  //   type: () => Profile,
-  //   required: false,
-  //   nullable: true,
-  // })
-  // profile?: Profile | null;
+  @ApiProperty({
+    enum: Role,
+  })
+  role: Role;
   // @ApiProperty({
   //   type: () => UserNotification,
   //   isArray: true,
   //   required: false,
   // })
   // userNotification?: UserNotification[];
-  // @ApiProperty({
-  //   type: () => Position,
-  //   isArray: true,
-  //   required: false,
-  // })
-  // position?: Position[];
   // @ApiProperty({
   //   type: () => Participant,
   //   isArray: true,

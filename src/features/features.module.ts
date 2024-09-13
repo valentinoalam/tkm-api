@@ -16,6 +16,7 @@ import { AuthModule } from './auth/auth.module';
 // import { UstadzModule } from './ustadz/ustadz.module';
 // import { BankModule } from './bank/bank.module';
 import { DariAppsheetModule } from './dari-appsheet/dari-appsheet.module';
+import { ItiqafModule } from './itiqaf/itiqaf.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { DariAppsheetModule } from './dari-appsheet/dari-appsheet.module';
 
     GoogleModule,
     DariAppsheetModule,
+    ItiqafModule,
   ],
   exports: [
     // AuthModule,

@@ -230,12 +230,14 @@ export class DariAppsheetService {
   }
 
   async getMonthlyBalanceReport(month: number, year: number) {
+    const yearFilter = year || new Date().getFullYear();
+    const monthFilter = month || new Date().getMonth();
     const groupedTransactions = await this.db.appsheetTransaksi.groupBy({
       by: ['categoryId'],
       where: {
         dtTransaction: {
-          gte: new Date(year, month - 1, 1),
-          lte: new Date(year, month, 0),
+          gte: new Date(yearFilter, monthFilter - 1, 1),
+          lte: new Date(yearFilter, monthFilter, 0),
         },
       },
       _sum: {

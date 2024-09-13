@@ -19,9 +19,10 @@ import { HealthModule } from './health/health.module';
 
 import { ConfigValidator } from '@/core/config/validator/config.validator';
 import { FeaturesModule } from '@/features/features.module';
-
+import { CacheModule } from '@nestjs/cache-manager';
 @Module({
   imports: [
+    CacheModule.register(),
     ConfigModule.forRoot({
       load: [configuration],
       validate: ConfigValidator,
@@ -52,9 +53,6 @@ import { FeaturesModule } from '@/features/features.module';
       rootPath: join(process.cwd(), '..', 'images'),
       serveRoot: '/img/',
     }),
-    //   inject: [AppConfigService],
-    //   imports: [AppConfigModule],
-    // }),
     FeaturesModule,
   ],
 
