@@ -29,28 +29,28 @@ generator custom_generator {
 //   output = "../docs"
 // }
 
-generator nestjsDto {
-  provider                        = "prisma-generator-nestjs-dto"
-  output                          = "./generated/dto"
-  outputToNestJsResourceStructure = "true"
-  flatResourceStructure           = "false"
-  exportRelationModifierClasses   = "true"
-  reExport                        = "true"
-  generateFileTypes               = "all"
-  createDtoPrefix                 = "Create"
-  updateDtoPrefix                 = "Update"
-  dtoSuffix                       = "Dto"
-  entityPrefix                    = ""
-  entitySuffix                    = ""
-  classValidation                 = "true"
-  fileNamingStyle                 = "camel"
-  noDependencies                  = "false"
-  outputType                      = "class"
-  definiteAssignmentAssertion     = "false"
-  requiredResponseApiProperty     = "true"
-  prettier                        = "true"
-  outputApiPropertyType           = "true"
-}
+// generator nestjsDto {
+//   provider                        = "prisma-generator-nestjs-dto"
+//   output                          = "./generated/dto"
+//   outputToNestJsResourceStructure = "true"
+//   flatResourceStructure           = "false"
+//   exportRelationModifierClasses   = "true"
+//   reExport                        = "true"
+//   generateFileTypes               = "all"
+//   createDtoPrefix                 = "Create"
+//   updateDtoPrefix                 = "Update"
+//   dtoSuffix                       = "Dto"
+//   entityPrefix                    = ""
+//   entitySuffix                    = ""
+//   classValidation                 = "true"
+//   fileNamingStyle                 = "camel"
+//   noDependencies                  = "false"
+//   outputType                      = "class"
+//   definiteAssignmentAssertion     = "false"
+//   requiredResponseApiProperty     = "true"
+//   prettier                        = "true"
+//   outputApiPropertyType           = "true"
+// }
 
 // generator zod {
 //   provider = "zod-prisma"
@@ -78,7 +78,7 @@ generator nestjsDto {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
-  // shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 model AppsheetPhoto {
   id              String  @id @default(uuid()) @db.Char(36)
