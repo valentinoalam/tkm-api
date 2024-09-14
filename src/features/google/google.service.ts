@@ -243,9 +243,9 @@ export class GoogleService {
       const [hours, minutes, seconds] = timePart
         .split(':')
         .map((num) => parseInt(num, 10));
-      return new Date(year, month, day, hours, minutes, seconds);
+        return new Date(Date.UTC(year, month - 1, day, hours, minutes, seconds));
     } else {
-      return new Date(year, month, day);
+      return new Date(Date.UTC(year, month, day));
     }
   }
 
