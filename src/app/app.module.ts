@@ -23,6 +23,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { UserActivityMiddleware } from '@/common/middlewares/user-activity.middleware';
 import { AuthModule } from '@/features/auth/auth.module';
 import { UsersModule } from '@/features/users/users.module';
+import { UsersService } from '@/features/users/services/users.service';
 @Module({
   imports: [
     CacheModule.register(),
@@ -64,6 +65,11 @@ import { UsersModule } from '@/features/users/users.module';
   controllers: [AppController /*SseController*/],
   providers: [
     AppService,
+    UsersService
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: AtGuard,
+    // },
     // SseService,
     // BroadcastService,
     /*ConfigValidator*/
@@ -73,5 +79,4 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LoggedMiddleware, UserActivityMiddleware).forRoutes({ path: '*', method: RequestMethod.ALL });
   }
-
 }
