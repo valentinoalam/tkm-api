@@ -24,6 +24,8 @@ import { UserActivityMiddleware } from '@/common/middlewares/user-activity.middl
 import { AuthModule } from '@/features/auth/auth.module';
 import { UsersModule } from '@/features/users/users.module';
 import { UsersService } from '@/features/users/services/users.service';
+import { AtGuard } from '@/common/guards';
+import { APP_GUARD } from '@nestjs/core';
 @Module({
   imports: [
     CacheModule.register(),
@@ -65,11 +67,11 @@ import { UsersService } from '@/features/users/services/users.service';
   controllers: [AppController /*SseController*/],
   providers: [
     AppService,
-    UsersService
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: AtGuard,
-    // },
+    UsersService,
+    {
+      provide: APP_GUARD,
+      useClass: AtGuard,
+    },
     // SseService,
     // BroadcastService,
     /*ConfigValidator*/
