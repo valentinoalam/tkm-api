@@ -20,7 +20,7 @@ import { HealthModule } from './health/health.module';
 import { ConfigValidator } from '@/core/config/validator/config.validator';
 import { FeaturesModule } from '@/features/features.module';
 import { CacheModule } from '@nestjs/cache-manager';
-import { UserActivityMiddleware } from '@/common/middlewares/user-activity/user-activity.middleware';
+import { UserActivityMiddleware } from '@/common/middlewares/user-activity.middleware';
 @Module({
   imports: [
     CacheModule.register(),
