@@ -62,8 +62,6 @@ import { UserActivityMiddleware } from '@/common/middlewares/user-activity/user-
     AppService,
     // SseService,
     // BroadcastService,
-    LoggedMiddleware,
-    UserActivityMiddleware,
     /*ConfigValidator*/
   ],
 })
