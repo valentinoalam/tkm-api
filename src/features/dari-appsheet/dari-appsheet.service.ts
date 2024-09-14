@@ -242,8 +242,8 @@ export class DariAppsheetService {
         c.category AS categoryName,
         c.type AS categoryType,
         SUM(t.amount) AS totalValue
-      FROM appsheetTransaksi t
-      JOIN appsheetKategori c ON t.category_id = c.id
+      FROM AppsheetTransaksi t
+      JOIN AppsheetKategori c ON t.category_id = c.id
       WHERE t.dtTransaction BETWEEN '${startDate.toISOString()}' AND '${endDate.toISOString()}'
       GROUP BY t.category_id, c.category, c.type;
     `;
@@ -261,7 +261,7 @@ export class DariAppsheetService {
     const totalDebit = formattedResult.reduce((sum, row) => sum + Number(row.debit), 0);
     const totalCredit = formattedResult.reduce((sum, row) => sum + Number(row.credit), 0);
 
-    return { resultWithCategory: formattedResult, totalDebit, totalCredit };
+    return { result: formattedResult, totalDebit, totalCredit };
   }
 
   async findAllCategories() {
