@@ -2,7 +2,7 @@ import { join } from 'path';
 
 import { LoggedMiddleware } from '@common/middlewares/logged.middleware';
 import configuration from '@core/config/configuration';
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import {
@@ -20,6 +20,7 @@ import { HealthModule } from './health/health.module';
 import { ConfigValidator } from '@/core/config/validator/config.validator';
 import { FeaturesModule } from '@/features/features.module';
 import { CacheModule } from '@nestjs/cache-manager';
+import { UserActivityMiddleware } from '@/common/middlewares/user-activity/user-activity.middleware';
 @Module({
   imports: [
     CacheModule.register(),
@@ -67,6 +68,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggedMiddleware).forRoutes('*');
+    consumer.apply(LoggedMiddleware, UserActivityMiddleware).forRoutes({ path: '*', method: RequestMethod.ALL });
   }
+
 }

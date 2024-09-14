@@ -31,11 +31,12 @@ export class User {
   })
   hashedRT: string | null;
   @ApiProperty({
-    type: 'string',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
     format: 'date-time',
     nullable: true,
   })
-  lastActive: Date | null;
+  lastActive: Date;
   @ApiProperty({
     type: 'string',
     format: 'date-time',
@@ -51,6 +52,7 @@ export class User {
     enum: Role,
   })
   role: Role;
+
   // @ApiProperty({
   //   type: () => UserNotification,
   //   isArray: true,

@@ -339,4 +339,10 @@ export class UsersService {
 
     return user;
   }
+  async updateLastActive(userId: string) {
+    await this.db.user.update({
+      where: { id: userId },
+      data: { lastActive: new Date() },
+    });
+  }
 }
