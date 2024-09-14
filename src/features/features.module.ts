@@ -21,18 +21,12 @@ import { ItiqafModule } from './itiqaf/itiqaf.module';
 @Module({
   imports: [
     // FilesModule,
-    AuthModule,
-    // VendorModule,
-    // MediaModule,
-    UsersModule,
-
     // NotificationModule,
     // EventsModule,
     // AssetsModule,
     // LedgerModule,
     // UstadzModule,
     // BankModule,
-
     GoogleModule,
     DariAppsheetModule,
     ItiqafModule,
@@ -42,14 +36,8 @@ import { ItiqafModule } from './itiqaf/itiqaf.module';
     // VendorModule,
     // MediaModule,
     // FilesModule,
-    UsersModule,
     GoogleModule,
   ],
-  providers: [
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: AtGuard,
-    // },
-  ],
+  providers: [],
 })
 export class FeaturesModule {}
