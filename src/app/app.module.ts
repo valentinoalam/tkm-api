@@ -21,6 +21,8 @@ import { ConfigValidator } from '@/core/config/validator/config.validator';
 import { FeaturesModule } from '@/features/features.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { UserActivityMiddleware } from '@/common/middlewares/user-activity.middleware';
+import { AuthModule } from '@/features/auth/auth.module';
+import { UsersModule } from '@/features/users/users.module';
 @Module({
   imports: [
     CacheModule.register(),
@@ -55,6 +57,8 @@ import { UserActivityMiddleware } from '@/common/middlewares/user-activity.middl
       serveRoot: '/img/',
     }),
     FeaturesModule,
+    AuthModule,
+    UsersModule,
   ],
 
   controllers: [AppController /*SseController*/],
