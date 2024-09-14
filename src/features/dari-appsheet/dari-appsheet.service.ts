@@ -232,34 +232,36 @@ export class DariAppsheetService {
   async getMonthlyBalanceReport(month: number, year: number) {
     const yearFilter = year || new Date().getFullYear();
     const monthFilter = month || new Date().getMonth();
-    console.log(monthFilter);
-    const groupedTransactions = await this.db.appsheetTransaksi.groupBy({
-      by: ['categoryId'],
-      where: {
-        dtTransaction: {
-          gte: new Date(yearFilter, monthFilter - 1, 1),
-          lte: new Date(yearFilter, monthFilter, 0),
-        },
-      },
-      _sum: {
-        value: true,
-      },
-    });
-      // Fetch related category data for each group
-    const resultWithCategory = await Promise.all(
-      groupedTransactions.map(async (group) => {
-        const category = await this.db.appsheetKategori.findUnique({
-          where: { id: group.categoryId },
-        });
-        return {
-          sum: group._sum.value,
-          categoryName: category?.category || 'Unknown',
-          type: category?.type || 'Unknown',
-        };
-      })
-    );
+  
+    const startDate = new Date(yearFilter, monthFilter, 1);
+    const endDate = new Date(yearFilter, monthFilter + 1, 0); // Last day of the month
+  
+    const query = `
+      SELECT 
+        t.category_id,
+        c.category AS categoryName,
+        c.type AS categoryType,
+        SUM(t.amount) AS totalValue
+      FROM appsheetTransaksi t
+      JOIN appsheetKategori c ON t.category_id = c.id
+      WHERE t.dtTransaction BETWEEN '${startDate.toISOString()}' AND '${endDate.toISOString()}'
+      GROUP BY t.category_id, c.category, c.type;
+    `;
 
-    return resultWithCategory;
+    const resultWithCategory:[] = await this.db.$queryRawUnsafe(query);
+
+    // Processing the result to format debit and credit
+    const formattedResult = resultWithCategory.map((row: any) => ({
+      categoryName: row.categoryName || 'Unknown',
+      debit: row.categoryType === 'Pengeluaran' ? row.totalValue : 0,
+      credit: row.categoryType === 'Penerimaan' ? row.totalValue : 0,
+    }));
+
+    // Calculate total debit and credit in one step
+    const totalDebit = formattedResult.reduce((sum, row) => sum + Number(row.debit), 0);
+    const totalCredit = formattedResult.reduce((sum, row) => sum + Number(row.credit), 0);
+
+    return { resultWithCategory: formattedResult, totalDebit, totalCredit };
   }
 
   async findAllCategories() {
