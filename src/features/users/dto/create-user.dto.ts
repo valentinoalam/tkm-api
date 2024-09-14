@@ -21,13 +21,5 @@ export class CreateUserDto {
   })
   @IsNotEmpty()
   @IsString()
-  hashedPassword: string;
-  @ApiProperty({
-    type: 'string',
-    required: false,
-    nullable: true,
-  })
-  @IsOptional()
-  @IsString()
-  hashedRT?: string | null;
+  password: string;
 }

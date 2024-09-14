@@ -22,7 +22,7 @@ import {
 } from '@nestjs/swagger';
 import { Request } from 'express';
 
-import { UpdateUserDto } from './dto';
+import { CreateUserDto, UpdateUserDto } from './dto';
 import { UsersService } from './services/users.service';
 
 @ApiTags('Users')
@@ -52,7 +52,7 @@ export class UsersController {
   }
 
   @Post('user')
-  async createUser() {
+  async createUser(@Body() data: CreateUserDto) {
     const dataOut = {
       status: true,
       message: '',
@@ -62,7 +62,7 @@ export class UsersController {
       logs: {},
     };
     try {
-      const user = await this.usersService.createFakeData();
+      const user = await this.usersService.create(data);
       dataOut.data.user = user;
     } catch (error) {
       dataOut.status = false;

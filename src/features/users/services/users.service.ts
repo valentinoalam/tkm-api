@@ -62,7 +62,7 @@ export class UsersService {
     if (user) {
       throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
     }
-    const hashedPassword = await hash(dto.hashedPassword);
+    const hashedPassword = await hash(dto.password);
 
     user = await this.db.user
       .create({
