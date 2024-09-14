@@ -20,12 +20,11 @@ import { HealthModule } from './health/health.module';
 import { ConfigValidator } from '@/core/config/validator/config.validator';
 import { FeaturesModule } from '@/features/features.module';
 import { CacheModule } from '@nestjs/cache-manager';
-import { UserActivityMiddleware } from '@/common/middlewares/user-activity.middleware';
 import { AuthModule } from '@/features/auth/auth.module';
 import { UsersModule } from '@/features/users/users.module';
 import { UsersService } from '@/features/users/services/users.service';
-import { AtGuard } from '@/common/guards';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { UserActivityInterceptor } from '@/common/interceptors/user-activity.interceptor';
 @Module({
   imports: [
     CacheModule.register(),
@@ -69,8 +68,8 @@ import { APP_GUARD } from '@nestjs/core';
     AppService,
     UsersService,
     {
-      provide: APP_GUARD,
-      useClass: AtGuard,
+      provide: APP_INTERCEPTOR,
+      useClass: UserActivityInterceptor,
     },
     // SseService,
     // BroadcastService,
@@ -79,6 +78,6 @@ import { APP_GUARD } from '@nestjs/core';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggedMiddleware, UserActivityMiddleware).forRoutes({ path: '*', method: RequestMethod.ALL });
+    consumer.apply(LoggedMiddleware).forRoutes({ path: '*', method: RequestMethod.ALL });
   }
 }

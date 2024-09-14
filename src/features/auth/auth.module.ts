@@ -11,6 +11,8 @@ import { AuthService } from './services/auth.service';
 import { SessionSerializer } from './session.serializer';
 import { AtStrategy, RtStrategy } from './strategies/jwt';
 import { LocalStrategy } from './strategies/local/local.strategy';
+import { APP_GUARD } from '@nestjs/core';
+import { AtGuard } from '@/common/guards';
 
 @Module({
   imports: [
@@ -18,15 +20,15 @@ import { LocalStrategy } from './strategies/local/local.strategy';
     ConfigModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
+      useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('app.jwtAccessSecret'),
         signOptions: { expiresIn: '7d' },
       }),
       inject: [ConfigService],
     }),
-    PassportModule.register({
-      session: true,
-    }),
+    // PassportModule.register({
+    //   session: true,
+    // }),
   ],
   controllers: [AuthController],
   providers: [
@@ -36,6 +38,10 @@ import { LocalStrategy } from './strategies/local/local.strategy';
     AtStrategy,
     LocalStrategy,
     SessionSerializer,
+    {
+      provide: APP_GUARD,
+      useClass: AtGuard
+    },
   ],
   exports: [AuthService],
 })

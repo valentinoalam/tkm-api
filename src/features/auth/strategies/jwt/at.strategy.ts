@@ -1,17 +1,18 @@
 import { DatabaseService } from '@core/database/database.service';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
 import { JwtPayload } from '../../payloads/jwtPayload.type';
+import { UsersService } from '@/features/users/services/users.service';
 
 @Injectable()
 export class AtStrategy extends PassportStrategy(Strategy, 'jwt-access') {
   constructor(
     config: ConfigService,
-    private db: DatabaseService,
+    public userService: UsersService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
@@ -24,11 +25,17 @@ export class AtStrategy extends PassportStrategy(Strategy, 'jwt-access') {
   }
 
   private static extractJWT(req: Request): string | null {
-    if (req.headers.authorization) return req.headers.authorization;
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+      return req.headers.authorization.split(' ')[1]; // Extract only the token part
+    }
     return null;
   }
 
   async validate(payload: JwtPayload) {
-    return payload;
+    const user = await this.userService.getById(payload.sub);
+    if (!user) {
+      throw new UnauthorizedException('User not found'); // Handle case when user is not found
+    }
+    return user;
   }
 }

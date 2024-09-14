@@ -15,6 +15,12 @@ export class AtGuard extends AuthGuard('jwt-access') implements CanActivate {
       context.getHandler(),
       context.getClass(),
     ]);
+
+    // If the route is public, bypass the guard
+    if (isPublic) {
+      return true;
+    }
+    
     const request = context.switchToHttp().getRequest();
     const { route } = request;
     // Exclude specific routes from authentication
@@ -22,8 +28,7 @@ export class AtGuard extends AuthGuard('jwt-access') implements CanActivate {
       route.path.includes('/auth/signin') ||
       route.path.includes('/auth/signup') ||
       route.path.includes('/auth/refresh') ||
-      /\/[^/]+\/fake-it/.test(route.path) ||
-      isPublic
+      /\/[^/]+\/fake-it/.test(route.path)
     ) {
       return true;
     }

@@ -95,16 +95,11 @@ export class UsersService {
   }
 
   async validateUser(username: string, password: string): Promise<any | null> {
-    // const validate = await this.db.user.compare(
-    //   password,
-    //   user?.getPassword(),
-    // );
-    // return validate ? user : null;
     const user = await this.db.user.findUnique({
       where: { id: username },
     });
     if (!user) {
-      throw new NotFoundException('The item does not exist');
+      throw new NotFoundException('The user does not exist');
     }
     if (user && (await verify(password, user.hashedPassword))) {
       const { hashedPassword, ...result } = user;

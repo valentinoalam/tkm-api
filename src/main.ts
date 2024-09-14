@@ -3,13 +3,13 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-
+import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app/app.module';
 import { AuthExceptionsFilter } from './common/filters/auth-exception.filter';
 import { PrismaClientExceptionFilter } from './common/filters/prisma-client-exception.filter';
 import SwaggerDocumentation from './core/config/swagger.config';
 
-declare const module;
+declare const module: any;
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['log', 'error', 'warn'],
@@ -26,6 +26,7 @@ async function bootstrap() {
   }
 
   app.setGlobalPrefix('api');
+  app.use(cookieParser());
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true, // Jika ingin diblock data selain data di dto harus dirubah whitelist = true
