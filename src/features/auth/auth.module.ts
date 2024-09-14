@@ -15,14 +15,11 @@ import { LocalStrategy } from './strategies/local/local.strategy';
 @Module({
   imports: [
     UsersModule,
-    JwtModule.register({
-      secret: process.env.WBMS_JWT_AT_KEY,
-      signOptions: { expiresIn: '5h' },
-    }),
+    ConfigModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('WBMS_JWT_RT_KEY'),
+        secret: configService.get<string>('app.jwtAccessSecret'),
         signOptions: { expiresIn: '7d' },
       }),
       inject: [ConfigService],
