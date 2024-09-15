@@ -67,10 +67,10 @@ import { UserActivityInterceptor } from '@/common/interceptors/user-activity.int
   providers: [
     AppService,
     UsersService,
-    // {
-    //   provide: APP_INTERCEPTOR,
-    //   useClass: UserActivityInterceptor,
-    // },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: UserActivityInterceptor,
+    },
     // SseService,
     // BroadcastService,
     /*ConfigValidator*/
