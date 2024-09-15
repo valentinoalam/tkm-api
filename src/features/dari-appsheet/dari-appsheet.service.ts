@@ -247,9 +247,9 @@ export class DariAppsheetService {
     const monthFilter = month - 1 || new Date().getMonth();
     if(dateStart && !dateEnd) dateEnd = this.setDateEnd(new Date(dateStart));
 
-    const startDate = new Date(dateStart) || new Date(yearFilter, monthFilter, 1);
-    const endDate = new Date(dateEnd) || new Date(yearFilter, monthFilter + 1, 0); // Last day of the month
-  
+    const startDate = dateStart ? new Date(dateStart) : new Date(yearFilter, monthFilter, 1);
+    const endDate = dateEnd ? new Date(dateEnd) : new Date(yearFilter, monthFilter + 1, 0); // Last day of the month
+    
     const query = `
       SELECT 
         t.category_id,
