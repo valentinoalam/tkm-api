@@ -229,12 +229,16 @@ export class DariAppsheetService {
     };
   }
 
-  setDateEnd(dateStart) {
+  setDatePair(date, isEnd) {
     // Create a new Date object with the year and month of dateStart
-    const nextMonth = new Date(dateStart.getFullYear(), dateStart.getMonth() + 1, 0);
-    
-    // Set the day to 0 to get the last day of the previous month (which is dateStart's month)
-    return nextMonth;
+    if(isEnd)
+      return new Date(Date.UTC(date.getFullYear(), date.getMonth() + 1, 0));// Set the day to 0 to get the last day of the previous month (which is dateStart's month)
+    else return  new Date(Date.UTC(date.getFullYear(), date.getMonth(), 1));
+  }
+  toUTC(dateStr) {
+    const date = new Date(dateStr);
+    date.setUTCHours(24)
+    return date;
   }
 
   async getMonthlyBalanceReport(
@@ -245,11 +249,12 @@ export class DariAppsheetService {
   ) {
     const yearFilter = year || new Date().getFullYear();
     const monthFilter = month - 1 || new Date().getMonth();
-    if(dateStart && !dateEnd) dateEnd = this.setDateEnd(new Date(dateStart));
 
-    const startDate = dateStart ? new Date(dateStart) : new Date(yearFilter, monthFilter, 1);
-    const endDate = dateEnd ? new Date(dateEnd) : new Date(yearFilter, monthFilter + 1, 0); // Last day of the month
-    
+    const startDate = !dateStart && dateEnd? this.setDatePair(new Date(dateEnd), 0) : dateStart ? this.toUTC(dateStart) : new Date(Date.UTC(yearFilter, monthFilter, 1));
+    const endDate = dateStart && !dateEnd? this.setDatePair(new Date(dateStart), 1) : dateEnd ? this.toUTC(dateEnd) : new Date(Date.UTC(yearFilter, monthFilter + 1, 0)); // Last day of the month
+    console.log(endDate)
+    console.log(startDate)
+    console.log(monthFilter)
     const query = `
       SELECT 
         t.category_id,
