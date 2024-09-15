@@ -81,8 +81,10 @@ export class DariAppsheetController {
   getMonthlyReport(    
     @Query('month') month: number,
     @Query('year') year: number,
+    @Query('startDate') dateStart?: string,
+    @Query('endDate') dateEnd?: string,
   ) {
-    return this.dariAppsheetService.getMonthlyBalanceReport(month, year);
+    return this.dariAppsheetService.getMonthlyBalanceReport(month, year, dateStart, dateEnd);
   }
   @Get('transactions/:id')
   findOneTransaction(@Param('id') id: string) {

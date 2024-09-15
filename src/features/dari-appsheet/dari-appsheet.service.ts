@@ -229,12 +229,26 @@ export class DariAppsheetService {
     };
   }
 
-  async getMonthlyBalanceReport(month: number, year: number) {
+  setDateEnd(dateStart) {
+    // Create a new Date object with the year and month of dateStart
+    const nextMonth = new Date(dateStart.getFullYear(), dateStart.getMonth() + 1, 0);
+    
+    // Set the day to 0 to get the last day of the previous month (which is dateStart's month)
+    return nextMonth;
+  }
+
+  async getMonthlyBalanceReport(
+    month: number, 
+    year: number, 
+    dateStart?: any,
+    dateEnd?: any,
+  ) {
     const yearFilter = year || new Date().getFullYear();
-    const monthFilter = month || new Date().getMonth();
-  
-    const startDate = new Date(yearFilter, monthFilter, 1);
-    const endDate = new Date(yearFilter, monthFilter + 1, 0); // Last day of the month
+    const monthFilter = month - 1 || new Date().getMonth();
+    if(dateStart && !dateEnd) dateEnd = this.setDateEnd(new Date(dateStart));
+
+    const startDate = new Date(dateStart) || new Date(yearFilter, monthFilter, 1);
+    const endDate = new Date(dateEnd) || new Date(yearFilter, monthFilter + 1, 0); // Last day of the month
   
     const query = `
       SELECT 
@@ -291,7 +305,6 @@ export class DariAppsheetService {
         path.dirname(originalFilePath),
         'small/' + file.filename,
       );
-      console.log(file)
       // Process the image to create a thumbnail
       await sharp(originalFilePath)
         .resize(200) // Resize to a width of 200px while maintaining aspect ratio
