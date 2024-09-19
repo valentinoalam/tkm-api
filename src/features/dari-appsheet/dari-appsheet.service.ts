@@ -235,6 +235,7 @@ export class DariAppsheetService {
       return new Date(Date.UTC(date.getFullYear(), date.getMonth() + 1, 0));// Set the day to 0 to get the last day of the previous month (which is dateStart's month)
     else return  new Date(Date.UTC(date.getFullYear(), date.getMonth(), 1));
   }
+  
   toUTC(dateStr) {
     const date = new Date(dateStr);
     date.setUTCHours(24)
