@@ -92,7 +92,7 @@ export class GoogleService {
     return doc;
   }
 
-  @Cron('30 1 * * *')
+  @Cron('* * 1 * * *')
   async getKasKecilData() {
     const messages: string[] = [];
     const doc = await this.getDocument();

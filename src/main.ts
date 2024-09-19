@@ -19,7 +19,7 @@ async function bootstrap() {
   const config = app.get(ConfigService);
   if (config.get('app.corsEnabled')) {
     app.enableCors({
-      origin: ['http://localhost:43000', 'https://new-tkm-web.vercel.app/'],
+      origin: ['http://localhost:43000', 'https://new-tkm-web.vercel.app'],
       methods: ['GET', 'POST', 'PATCH', 'DELETE'],
       credentials: true,
     });
