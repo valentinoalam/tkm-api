@@ -25,6 +25,7 @@ import { UsersModule } from '@/features/users/users.module';
 import { UsersService } from '@/features/users/services/users.service';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { UserActivityInterceptor } from '@/common/interceptors/user-activity.interceptor';
+import { ScheduleModule } from '@nestjs/schedule';
 @Module({
   imports: [
     CacheModule.register(),
@@ -53,7 +54,7 @@ import { UserActivityInterceptor } from '@/common/interceptors/user-activity.int
       ],
       //   // other options
     }),
-    // ScheduleModule.forRoot(),
+    ScheduleModule.forRoot(),
     ServeStaticModule.forRoot({
       rootPath: join(process.cwd(), '..', 'images'),
       serveRoot: '/img/',
