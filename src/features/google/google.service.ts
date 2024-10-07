@@ -137,7 +137,6 @@ export class GoogleService {
         }
 
         if (!categoryExists) {
-          console.log(categoryId);
           console.error(`Invalid categoryId at row ${i + 1}`);
           return null; // Skip this transaction if categoryId is invalid
         }
@@ -146,7 +145,6 @@ export class GoogleService {
           photoExists = await this.db.appsheetPhoto.findUnique({
             where: { name: photoName.split('/')[1] },
           });
-          console.log(photoExists.id);
           return {
             dtTransaction: tglPenerimaan ? this.parseDate(tglPenerimaan) : null,
             appSheetId: appSheetId,
