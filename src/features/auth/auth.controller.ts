@@ -33,7 +33,6 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Get('iam')
-  @UseGuards(AtGuard)
   async getIAM(@Req() req: Request) {
     const dataOut = {
       status: true,
@@ -45,7 +44,7 @@ export class AuthController {
     };
 
     try {
-      const user = await this.authService.getIAM(req.user['sub']);
+      const user = await this.authService.getIAM(req.user['id']);
 
       // const { name, profilePic, position, phone, address } = user.profile;
       const { username, email } = user;
@@ -118,7 +117,6 @@ export class AuthController {
   }
 
   @Post('signout')
-  @UseGuards(AtGuard)
   @ApiOperation({
     summary: 'Logout with a user',
   })

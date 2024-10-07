@@ -38,10 +38,10 @@ import { AtGuard } from '@/common/guards';
     AtStrategy,
     LocalStrategy,
     SessionSerializer,
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: AtGuard
-    // },
+    {
+      provide: APP_GUARD,
+      useClass: AtGuard
+    },
   ],
   exports: [AuthService],
 })

@@ -40,11 +40,6 @@ import { multerOptions } from '@/core/config/multer.config';
 export class DariAppsheetController {
   constructor(private readonly dariAppsheetService: DariAppsheetService) {}
 
-  @Get('data-chart')
-  getTransactionsDataChart() {
-    return this.dariAppsheetService.getTransactionsDataChart();
-  }
-
   @Get('data-summary')
   getTransactionsDataChartCompact() {
     return this.dariAppsheetService.getChartDataReport();

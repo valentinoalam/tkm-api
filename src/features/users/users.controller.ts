@@ -11,6 +11,7 @@ import {
   HttpCode,
   UploadedFile,
   UseInterceptors,
+  UseGuards,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -24,6 +25,7 @@ import { Request } from 'express';
 
 import { CreateUserDto, UpdateUserDto } from './dto';
 import { UsersService } from './services/users.service';
+import { AtGuard } from '@/common/guards';
 
 @ApiTags('Users')
 // @ApiBearerAuth('access-token')
@@ -83,21 +85,22 @@ export class UsersController {
       logs: {},
     };
     try {
-      const user = await this.usersService.getIAM(req.user['sub']);
 
-      const { name, profilePic, division, position, phone, alamat } =
-        user.profile;
+      const user = await this.usersService.getIAM(req.user['id']);
+
+      // const { name, profilePic, division, position, phone, alamat } =
+      //   user.profile;
       const { username, email, userRole } = user;
       dataOut.data.user = {
         username,
         role: userRole,
         email,
-        name,
-        profilePic,
-        division,
-        position,
-        phone,
-        alamat,
+        // name,
+        // profilePic,
+        // division,
+        // position,
+        // phone,
+        // alamat,
       };
     } catch (error) {
       dataOut.status = false;

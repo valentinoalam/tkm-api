@@ -117,13 +117,13 @@ export class UsersService {
       // },
     });
     if (!user) {
-      throw new NotFoundException();
+      throw new NotFoundException(`User with id ${id} not found`);
     }
 
-    delete user.hashedPassword;
-    delete user.hashedRT;
+    // Destructure to exclude sensitive fields
+    const { hashedPassword, hashedRT, ...safeUser } = user;
 
-    return user;
+    return safeUser;
   }
 
   async getAll(): Promise<any[]> {

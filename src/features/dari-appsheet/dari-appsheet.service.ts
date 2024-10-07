@@ -54,35 +54,6 @@ export class DariAppsheetService {
     });
   }
 
-  async getTransactionsDataChart() {
-    const data = await this.db.appsheetTransaksi.findMany({
-      where: { isDeleted: false },
-      include: {
-        category: {
-          select: {
-            category: true, // Include the category name
-            type: true,
-            color: true,
-          },
-        },
-      },
-      orderBy: {
-        dtTransaction: 'desc',
-      },
-    });
-
-    const transactionData = await data.map(
-      ({ dtTransaction, category, value }) => ({
-        dtTransaction,
-        category: category.category,
-        color: category.color,
-        in_out: category.type,
-        value,
-      }),
-    );
-    return transactionData;
-  }
-
   async getChartDataReport() {
     const groupedData = await this.db.$queryRaw`
       SELECT 
@@ -253,9 +224,7 @@ export class DariAppsheetService {
 
     const startDate = !dateStart && dateEnd? this.setDatePair(new Date(dateEnd), 0) : dateStart ? this.toUTC(dateStart) : new Date(Date.UTC(yearFilter, monthFilter, 1));
     const endDate = dateStart && !dateEnd? this.setDatePair(new Date(dateStart), 1) : dateEnd ? this.toUTC(dateEnd) : new Date(Date.UTC(yearFilter, monthFilter + 1, 0)); // Last day of the month
-    console.log(endDate)
-    console.log(startDate)
-    console.log(monthFilter)
+
     const query = `
       SELECT 
         t.category_id,
