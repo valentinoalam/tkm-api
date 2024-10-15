@@ -1,3 +1,21 @@
+I've added new modules and enhanced existing ones to provide comprehensive financial management services for your bookkeeping app. Here's a summary of the changes:
+
+Financial Reports Module: Generates balance sheets, income statements, cash flow statements, and trial balances.
+
+Budgets Module: Manages budgets and provides budget vs. actual comparisons.
+
+Ledgers Module: Handles general ledger operations and posting transactions to ledgers.
+
+Enhanced Transactions Module: Added date range and account-specific transaction retrieval, as well as a reconciliation feature.
+
+Updated App Module: Imported the new modules.
+
+These additions provide a solid foundation for financial reporting, budgeting, and ledger management in your non-profit organization's financial book. The new services and endpoints allow for generating various financial reports, managing budgets, working with ledgers, and performing more advanced transaction operations.
+
+To implement the specific logic for each service (e.g., generating reports, reconciling transactions), you'll need to add the appropriate business logic based on your organization's specific requirements and accounting principles.
+
+Remember to add proper authentication and authorization to these new endpoints to ensure data security. You may also want to consider adding data validation, error handling, and logging to these new services for a more robust application.
+
 # Aplikasi Tata Kelola Masjid
 
 Tujuan dibuatnya Aplikasi Web Sistem Tata Kelola Masjid dan Website Pelayanan Masjid adalah untuk meningkatkan efisiensi pengelolaan melalui pengaturan inventaris, keuangan, kegiatan, zakat, qurban, dan aktivitas lainnya secara terstruktur dan transparan. Dengan menyediakan laporan yang jelas dan dapat diakses oleh jamaah, aplikasi ini meningkatkan transparansi dan akuntabilitas, serta memudahkan akses informasi seperti jadwal ceramah, kegiatan rutin, dan fasilitas masjid. Selain itu, aplikasi ini mempermudah jamaah dalam melakukan pendaftaran itiqaf, pembayaran zakat, pendaftaran qurban, dan konsultasi zakat secara online, sehingga pelayanan menjadi lebih cepat dan efisien. Aplikasi ini juga memungkinkan penyimpanan dan akses mudah terhadap dokumentasi kegiatan, laporan, dan arsip penting lainnya, serta mendorong interaksi yang lebih baik antara pengurus masjid dan jamaah, meningkatkan partisipasi aktif jamaah dalam kegiatan dan program masjid.

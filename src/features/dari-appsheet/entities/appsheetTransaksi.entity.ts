@@ -1,74 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Prisma, TransactionType } from '@prisma/client';
-
-export class AppsheetKategori {
-  @ApiProperty({
-    type: 'string',
-  })
-  id: string;
-  @ApiProperty({
-    enum: TransactionType,
-  })
-  type: TransactionType;
-  @ApiProperty({
-    type: 'string',
-  })
-  category: string;
-  @ApiProperty({
-    type: 'string',
-    nullable: true,
-  })
-  color: string | null;
-  @ApiProperty({
-    type: 'string',
-    format: 'date-time',
-  })
-  dtCreated: Date;
-  @ApiProperty({
-    type: 'string',
-    format: 'date-time',
-    nullable: true,
-  })
-  dtModified: Date | null;
-  @ApiProperty({
-    type: () => AppsheetTransaksi,
-    isArray: true,
-    required: false,
-  })
-  transaksi?: AppsheetTransaksi[];
-}
-
-export class AppsheetPhoto {
-  @ApiProperty({
-    type: 'string',
-  })
-  id: string;
-  @ApiProperty({
-    type: 'string',
-  })
-  name: string;
-  @ApiProperty({
-    type: 'string',
-    nullable: true,
-  })
-  thumbnailLink: string | null;
-  @ApiProperty({
-    type: 'string',
-    nullable: true,
-  })
-  imageLink: string | null;
-  @ApiProperty({
-    type: 'string',
-    nullable: true,
-  })
-  downloadLink: string | null;
-  @ApiProperty({
-    type: () => AppsheetTransaksi,
-    required: false,
-    nullable: true,
-  })
-  transaksi?: AppsheetTransaksi | null;
-}
+import { AppsheetPhoto } from './AppsheetPhoto.entity';
+import { AppsheetKategori } from './appsheetKategori.entity';
 
 export class AppsheetTransaksi {
   @ApiProperty({

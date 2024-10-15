@@ -8,77 +8,37 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator nestjsDto {
+  provider                        = "prisma-generator-nestjs-dto"
+  output                          = "./generated/dto"
+  outputToNestJsResourceStructure = "true"
+  flatResourceStructure           = "false"
+  exportRelationModifierClasses   = "true"
+  reExport                        = "true"
+  generateFileTypes               = "all"
+  createDtoPrefix                 = "Create"
+  updateDtoPrefix                 = "Update"
+  dtoSuffix                       = "Dto"
+  entityPrefix                    = ""
+  entitySuffix                    = ""
+  classValidation                 = "true"
+  fileNamingStyle                 = "camel"
+  noDependencies                  = "false"
+  outputType                      = "class"
+  definiteAssignmentAssertion     = "false"
+  requiredResponseApiProperty     = "true"
+  prettier                        = "true"
+  outputApiPropertyType           = "true"
+}
 generator custom_generator {
     provider = "prisma-generator-fake-data"
     output   = "./types/fake-data.ts"
 }
 
-// generator dbml {
-//   provider = "prisma-dbml-generator"
-// }
-
-// generator erd {
-//   provider = "prisma-erd-generator"
-//    theme = "forest"   //default (default), forest, dark, neutral
-//    disabled = false
-//    includeRelationFromFields = true
-// }
-
-// generator docs {
-//   provider = "node node_modules/prisma-docs-generator"
-//   output = "../docs"
-// }
-
-// generator nestjsDto {
-//   provider                        = "prisma-generator-nestjs-dto"
-//   output                          = "./generated/dto"
-//   outputToNestJsResourceStructure = "true"
-//   flatResourceStructure           = "false"
-//   exportRelationModifierClasses   = "true"
-//   reExport                        = "true"
-//   generateFileTypes               = "all"
-//   createDtoPrefix                 = "Create"
-//   updateDtoPrefix                 = "Update"
-//   dtoSuffix                       = "Dto"
-//   entityPrefix                    = ""
-//   entitySuffix                    = ""
-//   classValidation                 = "true"
-//   fileNamingStyle                 = "camel"
-//   noDependencies                  = "false"
-//   outputType                      = "class"
-//   definiteAssignmentAssertion     = "false"
-//   requiredResponseApiProperty     = "true"
-//   prettier                        = "true"
-//   outputApiPropertyType           = "true"
-// }
-
-// generator zod {
-//   provider = "zod-prisma"
-//   output   = "./generated/zod" // (default) the directory where generated zod schemas will be saved
-
-//   relationModel = true // (default) Create and export both plain and related models.
-//   // relationModel         = "default" // Do not export model without relations.
-//   // relationModel         = false // Do not generate related model
-
-//   modelCase = "PascalCase" // (default) Output models using pascal case (ex. UserModel, PostModel)
-//   // modelCase             = "camelCase" // Output models using camel case (ex. userModel, postModel)
-
-//   modelSuffix = "Model" // (default) Suffix to apply to your prisma models when naming Zod schemas
-
-//   // useDecimalJs          = false // (default) represent the prisma Decimal type using as a JS number
-//   useDecimalJs = true // represent the prisma Decimal type using Decimal.js (as Prisma does)
-
-//   imports = null // (default) will import the referenced file in generated schemas to be used via imports.someExportedVariable
-
-//   // https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-by-null-values
-//   prismaJsonNullability = true // (default) uses prisma's scheme for JSON field nullability
-//   // prismaJsonNullability = false // allows null assignment to optional JSON fields
-// }
-
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
-  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+  // shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 model AppsheetPhoto {
   id              String  @id @default(uuid()) @db.Char(36)
@@ -91,6 +51,7 @@ model AppsheetPhoto {
 model AppsheetTransaksi {
   id              String  @id @default(uuid()) @db.Char(36)
   appSheetId      String?  @unique
+  accountId      String?
   categoryId      String  @map("category_id") @db.Char(36)
   photoId         String? @unique
   timeStamp       DateTime? 
@@ -103,110 +64,67 @@ model AppsheetTransaksi {
   dtModified      DateTime? @updatedAt @map("date_modified")
   category        AppsheetKategori @relation(fields: [categoryId], references: [id])
   photo           AppsheetPhoto? @relation(fields: [photoId], references: [id])
+  account         Account? @relation(fields: [accountId], references: [id])
 }
 
 model AppsheetKategori {
   id            String  @id @default(uuid()) @db.Char(36)
   type          TransactionType
   category      String    
+  description   String?
   color         String?
-  dtCreated     DateTime  @default(now()) @map("date_created")
-  dtModified    DateTime? @updatedAt @map("date_modified")
-  transaksi AppsheetTransaksi[]
+  createdAt     DateTime  @default(now()) @map("date_created")
+  updatedAt     DateTime? @updatedAt @map("date_modified")
+  transaksi     AppsheetTransaksi[]
+  budget        Budget[]
   @@unique([type, category])
 }
-
-model User {
-  id             String    @id @default(uuid()) @db.Char(36)
-  positionId     String?    @db.VarChar(36)
-  email          String?   @unique
-  username       String    @unique
-  hashedPassword String    @map("hashed_password") @db.VarChar(100)
-  hashedRT       String?   @map("hashed_rt") @db.VarChar(100)
-  lastActive     DateTime?
-  createdAt      DateTime  @default(now()) @map("date_created")
-  updatedAt      DateTime? @updatedAt @map("date_modified")
-  profile        Profile?
-  position       Position? @relation(fields: [positionId], references: [id])
-  role           Role      @default(USER)
+model TransactionCategory {
+  id            String  @id @default(uuid()) @db.Char(36)
+  type          TransactionType
+  boundary      Boundary?
+  category      String    
+  description   String?
+  color         String?
+  createdAt     DateTime  @default(now()) @map("date_created")
+  updatedAt     DateTime? @updatedAt @map("date_modified")
+  activity      TransactionActivity[]
+  @@unique([type, category])
 }
-
-enum Role {
-  ADMIN
-  USER
-}
-
-model Profile {
-  id         String    @id @default(uuid()) @db.Char(36)
-  userId     String    @unique @map("user_id") @db.VarChar(36)
-  dob        DateTime
-  name       String    @db.VarChar(50)
-  phone      String?   @db.VarChar(30)
-  address    String?   @db.VarChar(255)
-  dtModified   DateTime? @updatedAt @map("date_modified")
-
-  user User @relation(fields: [userId], references: [id])
-}
-
-model Position {
+model Account {
   id                  String  @id @default(uuid()) @db.Char(36)
-  organizationId      String  @db.Char(36) @unique
+  parentAccountId     String? @db.Char(36)// For hierarchical accounts
+  code                String
   name                String
-
+  description         String
+  type                AccountType
+  isDebit             Boolean
+  initialBalance      Decimal?
+  currentBalance      Decimal?
   createdAt           DateTime  @default(now()) @map("date_created")
   updatedAt           DateTime? @updatedAt @map("date_modified")
-  user                User[]      
+  parent              Account?  @relation("NestedAccount", fields: [parentAccountId], references: [id])
+  children            Account[] @relation("NestedAccount")
+  debitEntries        TransactionActivity[] @relation(name: "debitEntry")
+  creditEntries       TransactionActivity[] @relation(name: "creditEntry")
+  
+  ledger              Ledger[]
+  BankAccount         BankAccount[]
+  apsTransactions        AppsheetTransaksi[]
 
-  Organization        Organization @relation(fields: [organizationId], references: [id])
+  TrialBalanceDetail TrialBalanceDetail[]
+
+  transactions Transaction[]
 }
+model Budget {
+  id            String   @id @default(uuid())
+  categoryId    String
+  amount        Decimal
+  year          Int
+  month         Int
+  category      AppsheetKategori? @relation(fields: [categoryId], references: [id])
 
-model Organization {
-  id              String    @id @default(uuid()) @db.Char(36)         // UUID with 36 characters
-  mosqueId        String    @db.Char(36) @unique
-  name            String    @db.VarChar(100)    
-  periode         String
-  createdAt       DateTime  @default(now()) @map("date_created")
-  updatedAt       DateTime? @updatedAt @map("date_modified")
-  member          Position[]
-
-  mosque          Mosque    @relation(fields: [mosqueId], references: [id])
-
-}
-
-model Mosque {
-  id              String    @id @default(uuid()) @db.Char(36)         // UUID with 36 characters
-  name            String    @db.VarChar(100)                                   // Foundation name with a max length of 100 characters @unique @unique @unique
-  address         String    @db.VarChar(255)                          // Address with a max length of 255 characters
-  city            String    @db.VarChar(100)                          // City name with a max length of 100 characters
-  province        String    @db.VarChar(100)                          // Province name with a max length of 100 characters
-  logoUrl         String    @db.VarChar(255)                          // Logo URL with a max length of 255 characters
-  email           String    @unique @db.VarChar(100)                  // Email with a max length of 100 characters
-  whatsappNo      String    @db.VarChar(15)                           // WhatsApp number with a max length of 15 characters (e.g., +123456789012345)
-
-  // Optional fields with character limits:
-  phoneNo         String?   @db.VarChar(15)                           // Optional phone number with a max length of 15 characters
-  websiteUrl      String?   @db.VarChar(255)                          // Optional website URL with a max length of 255 characters
-
-  createdAt       DateTime  @default(now()) @map("date_created")      // Creation timestamp
-  updatedAt       DateTime? @updatedAt @map("date_modified")          // Last update timestamp
-  // Relations (if applicable):
-  organization    Organization?
-}
-
-enum Boundary {
-  Permanen
-  Sementara
-  Tanpa_Batasan
-}
-
-model TransactionCategory {
-  id          String    @id @default(uuid()) @db.Char(36)
-  name        String
-  description String
-  boundary    Boundary
-  createdAt   DateTime  @default(now()) @map("date_created")
-  updatedAt   DateTime? @updatedAt @map("date_modified")
-  activity    TransactionActivity[]
+  @@unique([categoryId, year, month])
 }
 
 model TransactionActivity {
@@ -220,7 +138,7 @@ model TransactionActivity {
   createdAt       DateTime              @default(now()) @map("date_created")
   updatedAt       DateTime?             @updatedAt @map("date_modified")
   category        TransactionCategory?  @relation(fields: [categoryId], references: [id])
-  Transaction     Transaction[]
+  transaction     Transaction[]
 }
 
 enum TransactionType {
@@ -231,6 +149,7 @@ enum TransactionType {
 model Transaction {
   id              String           @id @default(uuid()) @db.Char(36)
   activityId      String           @db.Char(36)
+  accountId       String           @db.Char(36)
   vendorId        String?          @db.Char(36)
   mediaId         String?          @db.Char(36)
   programId       String?          @db.Char(36)
@@ -240,8 +159,9 @@ model Transaction {
   dtTrx           DateTime
   amount          Decimal
   activity        TransactionActivity   @relation(fields: [activityId], references: [id])
+  account         Account               @relation(fields: [accountId], references: [id])
   vendor          Vendor?               @relation(fields: [vendorId], references: [id])
-  PAP             Media?                @relation(fields: [mediaId], references: [id])
+  media           Media?                @relation(fields: [mediaId], references: [id])
   program         Program?              @relation(fields: [programId], references: [id])
   createdAt       DateTime              @default(now()) @map("date_created")
   updatedAt       DateTime?             @updatedAt @map("date_modified")
@@ -257,6 +177,8 @@ enum ProgramStatus {
 
 model Program {
   id                  String  @id @default(uuid()) @db.Char(36)
+  name                String
+  description         String
   budget              Decimal
   realisation         Decimal
   uptake              Decimal
@@ -273,39 +195,6 @@ enum AccountType {
   Income
   Expense
 }
-
-model Account {
-  id                  String  @id @default(uuid()) @db.Char(36)
-  parentAccountId     String? @db.Char(36)// For hierarchical accounts
-  code                String
-  name                String
-  description         String
-  type                AccountType
-  isDebit             Boolean
-  startBalance        Decimal?
-  currentBalance      Decimal?
-  createdAt           DateTime  @default(now()) @map("date_created")
-  updatedAt           DateTime? @updatedAt @map("date_modified")
-  parent              Account?  @relation("NestedAccount", fields: [parentAccountId], references: [id])
-  children            Account[] @relation("NestedAccount")
-  debitEntries        TransactionActivity[] @relation(name: "debitEntry")
-  creditEntries       TransactionActivity[] @relation(name: "creditEntry")
-  ledger              Ledger[]
-  BankAccount         BankAccount[]
-}
-
-model BankAccount {
-  id            String  @id @default(uuid()) @db.Char(36)
-  accountId     String
-  bankName      String
-  accountNumber String
-  onBehalfOf    String
-  description   String
-  createdAt     DateTime @default(now()) @map("date_created")
-  updatedAt     DateTime? @updatedAt @map("date_modified") 
-  account       Account   @relation(fields: [accountId], references: [id])
-}
-
 model TrialBalance {
   id          String  @id @default(uuid()) @db.Char(36)
   ledgerId    String  @db.Char(36)
@@ -321,10 +210,11 @@ model TrialBalance {
 model TrialBalanceDetail {
   id              String  @id @default(uuid()) @db.Char(36)
   trialBalanceId  String  @db.Char(36)
+  accountId       String    @db.Char(36)
   isDebit         Boolean @default(true)
   openingBalance  Decimal
   closingBalance  Decimal
-  account         String
+  account         Account       @relation(fields: [accountId], references: [id])
   trialBalance    TrialBalance  @relation(fields: [trialBalanceId], references: [id])
 }
 
@@ -362,6 +252,138 @@ enum Period {
   YEARLY
 }
 
+model User {
+  id             String    @id @default(uuid()) @db.Char(36)
+  positionId     String?    @db.VarChar(36)
+  email          String?   @unique
+  username       String    @unique
+  hashedPassword String    @map("hashed_password") @db.VarChar(100)
+  hashedRT       String?   @map("hashed_rt") @db.VarChar(100)
+  lastActive     DateTime?
+  createdAt      DateTime  @default(now()) @map("date_created")
+  updatedAt      DateTime? @updatedAt @map("date_modified")
+  profile        Profile?
+  position       Position? @relation(fields: [positionId], references: [id])
+
+  userRoles      UserRoles[]
+
+  Mosque         Mosque?
+
+  notifications  UserNotification[]
+}
+
+model UserNotification {
+  id                String  @id @default(uuid()) @db.Char(36)
+  userId            String @map("user_id") @db.Char(36)
+  notificationId   String @map("notif_id") @db.Char(36)
+  status            NotificationStatus 
+
+  createdAt       DateTime    @default(now())
+  readAt          DateTime?
+  user  User?         @relation(fields: [userId], references: [id])
+  notif Notification  @relation(fields: [notificationId], references: [id])
+
+  @@unique([userId, notificationId])
+}
+model UserRoles {
+  id        String  @id @default(uuid()) @db.Char(36)
+  userId    String  @db.Char(36)
+  roleId    String  @db.Char(36)
+  user      User    @relation(fields: [userId], references: [id])
+  role      Role    @relation(fields: [roleId], references: [id])
+
+  @@unique([userId, roleId])
+}
+model Role {
+  id           String    @id @default(uuid()) @db.Char(36)
+  name         String
+  description  String
+  user_roles   UserRoles[]
+  roleAccess   RoleAccess[]
+}
+
+model RoleAccess {
+  id           String  @id @default(uuid()) @db.Char(36)
+  roleId       String  @db.VarChar(36)
+  resource     String
+  action       String
+  role         Role    @relation(fields: [roleId], references: [id])
+}
+
+model Profile {
+  id         String    @id @default(uuid()) @db.Char(36)
+  userId     String    @unique @map("user_id") @db.VarChar(36)
+  dob        DateTime
+  name       String    @db.VarChar(50)
+  phone      String?   @db.VarChar(30)
+  address    String?   @db.VarChar(255)
+  dtModified   DateTime? @updatedAt @map("date_modified")
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Position {
+  id                  String  @id @default(uuid()) @db.Char(36)
+  fondationId      String  @db.Char(36) @unique
+  name                String
+
+  createdAt           DateTime  @default(now()) @map("date_created")
+  updatedAt           DateTime? @updatedAt @map("date_modified")
+  user                User[]      
+  fondation           Fondation @relation(fields: [fondationId], references: [id])
+}
+
+model Fondation {
+  id              String    @id @default(uuid()) @db.Char(36)         // UUID with 36 characters
+  mosqueId        String    @db.Char(36) @unique
+  name            String    @db.VarChar(100)    
+  periode         String
+  createdAt       DateTime  @default(now()) @map("date_created")
+  updatedAt       DateTime? @updatedAt @map("date_modified")
+  member          Position[]
+  mosque          Mosque    @relation(fields: [mosqueId], references: [id])
+
+}
+
+model BankAccount {
+  id            String  @id @default(uuid()) @db.Char(36)
+  accountId     String
+  bankName      String
+  accountNumber String
+  onBehalfOf    String
+  description   String
+  createdAt     DateTime @default(now()) @map("date_created")
+  updatedAt     DateTime? @updatedAt @map("date_modified") 
+  account       Account   @relation(fields: [accountId], references: [id])
+}
+model Mosque {
+  id              String    @id @default(uuid()) @db.Char(36)         // UUID with 36 characters
+  userId          String    @db.Char(36) @unique
+  name            String    @db.VarChar(100)                                   // Foundation name with a max length of 100 characters @unique @unique @unique
+  address         String    @db.VarChar(255)                          // Address with a max length of 255 characters
+  city            String    @db.VarChar(100)                          // City name with a max length of 100 characters
+  province        String    @db.VarChar(100)                          // Province name with a max length of 100 characters
+  logoUrl         String    @db.VarChar(255)                          // Logo URL with a max length of 255 characters
+  email           String    @unique @db.VarChar(100)                  // Email with a max length of 100 characters
+  whatsappNo      String    @db.VarChar(15)                           // WhatsApp number with a max length of 15 characters (e.g., +123456789012345)
+
+  // Optional fields with character limits:
+  phoneNo         String?   @db.VarChar(15)                           // Optional phone number with a max length of 15 characters
+  websiteUrl      String?   @db.VarChar(255)                          // Optional website URL with a max length of 255 characters
+
+  createdAt       DateTime  @default(now()) @map("date_created")      // Creation timestamp
+  updatedAt       DateTime? @updatedAt @map("date_modified")          // Last update timestamp
+  // Relations (if applicable):
+  fondation    Fondation?
+  user         User      @relation(fields: [userId], references: [id])
+}
+
+enum Boundary {
+  Permanen
+  Sementara
+  Tanpa_Batasan
+}
+
 model Vendor {
   id            String         @id @default(uuid()) @db.Char(36)
   name          String
@@ -371,7 +393,7 @@ model Vendor {
   note          String
   createdAt     DateTime       @default(now()) @map("date_created")
   updatedAt     DateTime?      @updatedAt @map("date_modified")
-  journalEntry  Transaction[]
+  transactions  Transaction[]
 }
 
 model Media {
@@ -474,4 +496,24 @@ model Ustadz {
   name          String
   phone         String
   address       String
+}
+
+model Notification {
+  id              String             @id @default(uuid()) @db.Char(36)
+  sender          String?
+  title           String
+  message         String
+  photoUrl        String?
+  dtCreated       DateTime           @default(now())
+  receiver        UserNotification[]
+  sentAt          DateTime
+  @@map("notification")
+}
+
+enum NotificationStatus {
+  Pending
+  Sent
+  Failed
+  Delivered
+  Readed
 }

@@ -59,9 +59,9 @@ import { ScheduleModule } from '@nestjs/schedule';
       rootPath: join(process.cwd(), '..', 'images'),
       serveRoot: '/img/',
     }),
-    FeaturesModule,
     AuthModule,
     UsersModule,
+    FeaturesModule,
   ],
 
   controllers: [AppController /*SseController*/],

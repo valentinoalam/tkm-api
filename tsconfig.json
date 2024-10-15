@@ -16,7 +16,7 @@
       "@core/*": ["./src/core/*"],
       "@feat/*": ["./src/features/*"],
     },
-    "types": ["express", "multer"], // Include Multer types
+    "types": ["express", "multer", "jest"], // Include Multer types
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": false,

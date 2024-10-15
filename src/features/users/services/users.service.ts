@@ -18,6 +18,8 @@ import { UpdateUserDto } from '../dto/update-user.dto';
 import { User as UserEntity } from '../entities/user.entity';
 
 import * as fakeData from '@/shared/fake-data';
+import { UpdateProfileDto } from '../components/profile/dto';
+import { Profile } from '../components/profile/entities';
 
 @Injectable()
 export class UsersService {
@@ -225,107 +227,128 @@ export class UsersService {
     file: Express.Multer.File,
     userId: string,
   ) {
-    let updateData = new UserEntity();
-    const profileDto = ['name', 'file', 'position', 'phone', 'address'];
-    if (dto.hashedPassword)
+    let updateData: Partial<UserEntity> = {};
+  
+    // Define properties that are related to the profile update
+    const profileDto = ['name', 'position', 'phone', 'address'];
+  
+    // Handle password hashing
+    if (dto.hashedPassword) {
       updateData.hashedPassword = await hash(dto.hashedPassword);
-    delete dto.hashedPassword;
-
-    const filteredDto: any = {};
-
+      delete dto.hashedPassword;
+    }
+  
+    // Filter out empty fields from dto
+    const filteredDto: Partial<UpdateUserDto> = Object.entries(dto).reduce(
+      (acc, [key, value]) => {
+        if (value) acc[key] = value;
+        return acc;
+      },
+      {} as Partial<UpdateUserDto>
+    );
+  
+    // Separate filtered DTO for the user entity and profile-related properties
     const filteredUserDto: Partial<UserEntity> = {};
-
-    // let filteredProfileDto: Partial<Profile> = {};
-
-    for (const prop in dto) {
-      if (dto[prop]) {
-        filteredDto[prop] = dto[prop];
+    const filteredProfileDto: Partial<Profile> = {};
+  
+    // Separate the DTO fields between User and Profile
+    for (const prop in filteredDto) {
+      if (profileDto.includes(prop)) {
+        filteredProfileDto[prop] = filteredDto[prop];
+      } else {
+        filteredUserDto[prop] = filteredDto[prop];
       }
     }
-    for (const prop in filteredDto) {
-      // if (profileDto.includes(prop)) {
-      //   filteredProfileDto[prop] = filteredDto[prop];
-      // } else {
-        filteredUserDto[prop] = filteredDto[prop];
-      // }
+  
+    // Add additional metadata to profile DTO
+    if (Object.keys(filteredProfileDto).length) {
+      filteredProfileDto.dtModified = new Date();
     }
-
-    // filteredProfileDto = {
-    //   ...filteredProfileDto,
-    //   userModified: userId,
-    //   dtModified: new Date(),
-    // };
-
+  
+    // Handle file upload
     // if (file) {
     //   filteredProfileDto.profilePic = file.filename;
     // }
-
+  
+    // Update user data with the filtered DTO and timestamps
     updateData = {
       ...updateData,
       ...filteredUserDto,
       updatedAt: new Date(),
-      
     };
-
-    const updatedUser = await this.db.user
-      .update({
+  
+    try {
+      const updatedUser = await this.db.user.update({
         where: { id: id },
         data: {
           ...updateData,
-          // profile: {
-          //   update: {
-          //     name: filteredProfileDto.name,
-          //     profilePic: filteredProfileDto.profilePic,
-          //     phone: filteredProfileDto.phone,
-          //     address: filteredProfileDto.address,
-          //     position: filteredProfileDto.position,
-          //   },
-          // },
-          // userNotification: {
-          //   // Update logic for user notifications
-          // },
-          // position: {
-          //   // Update logic for positions
-          // },
-          // participant: {
-          //   // Update logic for participants
-          // },
+          // Update profile if there are profile fields
+          profile: Object.keys(filteredProfileDto).length
+            ? {
+                update: {
+                  ...filteredProfileDto,
+                },
+              }
+            : undefined,
+          // Connect to new position if positionId is provided
+          position: dto.positionId
+            ? {
+                connect: { id: dto.positionId },
+              }
+            : undefined,
+          // Update userRoles if provided
+          userRoles: dto.userRoles
+            ? {
+                set: dto.userRoles.map((userRole) => ({
+                  id: userRole.id,
+                })),
+              }
+            : undefined,
+          // Handle notifications update if needed
+          notifications: dto.notifications
+            ? {
+                updateMany: dto.notifications.map((notification) => ({
+                  where: { id: notification.id },
+                  data: {
+                    ...notification,
+                  },
+                })),
+              }
+            : undefined,
         },
-        // include: {
-        //   profile: true,
-        // },
-      })
-      .catch((error) => {
-        if (error instanceof Prisma.PrismaClientKnownRequestError) {
-          if (error.code === 'P2002') {
-            throw new ForbiddenException('Username/Email/NIK already taken.');
-          }
-        }
-        throw error;
       });
-
-    return updatedUser;
+  
+      return updatedUser;
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          throw new ForbiddenException('Username/Email/NIK already taken.');
+        }
+      }
+      throw error;
+    }
   }
+  
 
-  // async updateUserProfile(
-  //   userId: string,
-  //   dto: UpdateProfileDto,
-  // ): Promise<Profile> {
-  //   try {
-  //     return await this.db.profile.update({
-  //       where: {
-  //         userId: userId,
-  //       },
-  //       data: {
-  //         ...dto,
-  //       },
-  //     });
-  //   } catch (err) {
-  //     if (err?.code === 'P2025') {
-  //       throw new NotFoundException(`Record ${userId} to update not found`);
-  //     }
-  //   }
-  // }
+  async updateUserProfile(
+    userId: string,
+    dto: UpdateProfileDto,
+  ): Promise<Profile> {
+    try {
+      return await this.db.profile.update({
+        where: {
+          userId: userId,
+        },
+        data: {
+          ...dto,
+        },
+      });
+    } catch (err) {
+      if (err?.code === 'P2025') {
+        throw new NotFoundException(`Record ${userId} to update not found`);
+      }
+    }
+  }
 
   async deleteById(id: string, userId: string) {
     const user = await this.db.user.delete({

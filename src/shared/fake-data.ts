@@ -134,28 +134,24 @@ export function fakeTransactionComplete() {
 }
 export function fakeProgram() {
   return {
+    name: faker.person.fullName(),
+    description: faker.lorem.words(5),
     budget: new Decimal(faker.number.float()),
     realisation: new Decimal(faker.number.float()),
     uptake: new Decimal(faker.number.float()),
-    status: faker.helpers.arrayElement([
-      ProgramStatus.Fundraising,
-      ProgramStatus.OnProgress,
-      ProgramStatus.Completed,
-    ] as const),
+    status: faker.helpers.arrayElement([ProgramStatus.Fundraising, ProgramStatus.OnProgress, ProgramStatus.Completed] as const),
     updatedAt: undefined,
   };
 }
 export function fakeProgramComplete() {
   return {
     id: faker.string.uuid(),
+    name: faker.person.fullName(),
+    description: faker.lorem.words(5),
     budget: new Decimal(faker.number.float()),
     realisation: new Decimal(faker.number.float()),
     uptake: new Decimal(faker.number.float()),
-    status: faker.helpers.arrayElement([
-      ProgramStatus.Fundraising,
-      ProgramStatus.OnProgress,
-      ProgramStatus.Completed,
-    ] as const),
+    status: faker.helpers.arrayElement([ProgramStatus.Fundraising, ProgramStatus.OnProgress, ProgramStatus.Completed] as const),
     createdAt: new Date(),
     updatedAt: undefined,
   };

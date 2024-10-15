@@ -22,7 +22,7 @@ export class AbilityFactory {
   defineAbility(user: User): AppAbility {
     const { can, cannot, build } = new AbilityBuilder<AppAbility>(Ability as any);
 
-    if (user.role === 'ADMIN') {
+    if (user.userRoles.some(role => role.id === 'ADMIN')) {
       can(Action.Manage, 'all');  // Admin can manage everything
     } else {
       can(Action.Read, User);      // Regular users can only read themselves
