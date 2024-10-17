@@ -19,16 +19,17 @@ import { HealthModule } from './health/health.module';
 
 import { ConfigValidator } from '@/core/config/validator/config.validator';
 import { FeaturesModule } from '@/features/features.module';
-import { CacheModule } from '@nestjs/cache-manager';
+import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
 import { AuthModule } from '@/features/auth/auth.module';
 import { UsersModule } from '@/features/users/users.module';
 import { UsersService } from '@/features/users/services/users.service';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { UserActivityInterceptor } from '@/common/interceptors/user-activity.interceptor';
 import { ScheduleModule } from '@nestjs/schedule';
+import { CaslModule } from './casl/casl.module';
 @Module({
   imports: [
-    CacheModule.register(),
+    CacheModule.register({ isGlobal: true }),
     ConfigModule.forRoot({
       load: [configuration],
       validate: ConfigValidator,
@@ -62,12 +63,17 @@ import { ScheduleModule } from '@nestjs/schedule';
     AuthModule,
     UsersModule,
     FeaturesModule,
+    CaslModule,
   ],
 
   controllers: [AppController /*SseController*/],
   providers: [
     AppService,
     UsersService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: CacheInterceptor,
+    },
     {
       provide: APP_INTERCEPTOR,
       useClass: UserActivityInterceptor,

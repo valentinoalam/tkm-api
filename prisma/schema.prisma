@@ -8,33 +8,32 @@ generator client {
   provider = "prisma-client-js"
 }
 
-generator nestjsDto {
-  provider                        = "prisma-generator-nestjs-dto"
-  output                          = "./generated/dto"
-  outputToNestJsResourceStructure = "true"
-  flatResourceStructure           = "false"
-  exportRelationModifierClasses   = "true"
-  reExport                        = "true"
-  generateFileTypes               = "all"
-  createDtoPrefix                 = "Create"
-  updateDtoPrefix                 = "Update"
-  dtoSuffix                       = "Dto"
-  entityPrefix                    = ""
-  entitySuffix                    = ""
-  classValidation                 = "true"
-  fileNamingStyle                 = "camel"
-  noDependencies                  = "false"
-  outputType                      = "class"
-  definiteAssignmentAssertion     = "false"
-  requiredResponseApiProperty     = "true"
-  prettier                        = "true"
-  outputApiPropertyType           = "true"
-}
-generator custom_generator {
-    provider = "prisma-generator-fake-data"
-    output   = "./types/fake-data.ts"
-}
-
+// generator nestjsDto {
+//   provider                        = "prisma-generator-nestjs-dto"
+//   output                          = "./generated/dto"
+//   outputToNestJsResourceStructure = "true"
+//   flatResourceStructure           = "false"
+//   exportRelationModifierClasses   = "true"
+//   reExport                        = "true"
+//   generateFileTypes               = "all"
+//   createDtoPrefix                 = "Create"
+//   updateDtoPrefix                 = "Update"
+//   dtoSuffix                       = "Dto"
+//   entityPrefix                    = ""
+//   entitySuffix                    = ""
+//   classValidation                 = "true"
+//   fileNamingStyle                 = "camel"
+//   noDependencies                  = "false"
+//   outputType                      = "class"
+//   definiteAssignmentAssertion     = "false"
+//   requiredResponseApiProperty     = "true"
+//   prettier                        = "true"
+//   outputApiPropertyType           = "true"
+// }
+// generator custom_generator {
+//     provider = "prisma-generator-fake-data"
+//     output   = "./types/fake-data.ts"
+// }
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
@@ -64,7 +63,6 @@ model AppsheetTransaksi {
   dtModified      DateTime? @updatedAt @map("date_modified")
   category        AppsheetKategori @relation(fields: [categoryId], references: [id])
   photo           AppsheetPhoto? @relation(fields: [photoId], references: [id])
-  account         Account? @relation(fields: [accountId], references: [id])
 }
 
 model AppsheetKategori {
@@ -110,11 +108,8 @@ model Account {
   
   ledger              Ledger[]
   BankAccount         BankAccount[]
-  apsTransactions        AppsheetTransaksi[]
-
-  TrialBalanceDetail TrialBalanceDetail[]
-
-  transactions Transaction[]
+  TrialBalanceDetail  TrialBalanceDetail[]
+  transactions        Transaction[]
 }
 model Budget {
   id            String   @id @default(uuid())
@@ -160,7 +155,6 @@ model Transaction {
   amount          Decimal
   activity        TransactionActivity   @relation(fields: [activityId], references: [id])
   account         Account               @relation(fields: [accountId], references: [id])
-  vendor          Vendor?               @relation(fields: [vendorId], references: [id])
   media           Media?                @relation(fields: [mediaId], references: [id])
   program         Program?              @relation(fields: [programId], references: [id])
   createdAt       DateTime              @default(now()) @map("date_created")
@@ -313,9 +307,10 @@ model RoleAccess {
 model Profile {
   id         String    @id @default(uuid()) @db.Char(36)
   userId     String    @unique @map("user_id") @db.VarChar(36)
-  dob        DateTime
+  dob        DateTime?
   name       String    @db.VarChar(50)
   phone      String?   @db.VarChar(30)
+  profilePic String?   @db.VarChar(30)
   address    String?   @db.VarChar(255)
   dtModified   DateTime? @updatedAt @map("date_modified")
 
@@ -384,17 +379,6 @@ enum Boundary {
   Tanpa_Batasan
 }
 
-model Vendor {
-  id            String         @id @default(uuid()) @db.Char(36)
-  name          String
-  phone         String
-  address       String
-  businessField String         @map("jenis_usaha")
-  note          String
-  createdAt     DateTime       @default(now()) @map("date_created")
-  updatedAt     DateTime?      @updatedAt @map("date_modified")
-  transactions  Transaction[]
-}
 
 model Media {
   id  String  @id @default(uuid()) @db.Char(36)
@@ -496,6 +480,19 @@ model Ustadz {
   name          String
   phone         String
   address       String
+  createdAt     DateTime       @default(now()) @map("date_created")
+  updatedAt     DateTime?      @updatedAt @map("date_modified")
+}
+
+model Vendor {
+  id            String         @id @default(uuid()) @db.Char(36)
+  name          String
+  phone         String
+  address       String
+  businessField String         @map("jenis_usaha")
+  note          String
+  createdAt     DateTime       @default(now()) @map("date_created")
+  updatedAt     DateTime?      @updatedAt @map("date_modified")
 }
 
 model Notification {

@@ -186,30 +186,6 @@ export class DariAppsheetController {
     return await this.dariAppsheetService.removeKategori(id);
   }
 
-  
-  @Get('balance-sheet')
-  @ApiOperation({ summary: 'Generate Balance Sheet' })
-  @ApiQuery({ name: 'date', required: true, type: Date })
-  @ApiResponse({ status: 200, description: 'Balance sheet generated successfully' })
-  async getBalanceSheet(@Query('date') date: string) {
-    const balanceSheetDate = new Date(date);
-    return this.dariAppsheetService.generateBalanceSheet(balanceSheetDate);
-  }
-
-  @Get('income-statement')
-  @ApiOperation({ summary: 'Generate Income Statement' })
-  @ApiQuery({ name: 'startDate', required: true, type: Date })
-  @ApiQuery({ name: 'endDate', required: true, type: Date })
-  @ApiResponse({ status: 200, description: 'Income statement generated successfully' })
-  async getIncomeStatement(
-    @Query('startDate') startDate: string,
-    @Query('endDate') endDate: string
-  ) {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    return this.dariAppsheetService.generateIncomeStatement(start, end);
-  }
-
   @Get('cash-flow-statement')
   @ApiOperation({ summary: 'Generate Cash Flow Statement' })
   @ApiQuery({ name: 'startDate', required: true, type: Date })
@@ -222,15 +198,6 @@ export class DariAppsheetController {
     const start = new Date(startDate);
     const end = new Date(endDate);
     return this.dariAppsheetService.getCashFlowStatement(start, end);
-  }
-
-  @Get('trial-balance')
-  @ApiOperation({ summary: 'Generate Trial Balance' })
-  @ApiQuery({ name: 'date', required: true, type: Date })
-  @ApiResponse({ status: 200, description: 'Trial balance generated successfully' })
-  async getTrialBalance(@Query('date') date: string) {
-    const balanceDate = new Date(date);
-    return this.dariAppsheetService.generateTrialBalance(balanceDate);
   }
 
   @Get('yearly-summary/:year')

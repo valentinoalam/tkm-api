@@ -11,6 +11,7 @@ import { JwtPayload } from '../payloads/jwtPayload.type';
 import { Tokens } from '../types';
 
 import { User } from '@/features/users/entities';
+import { RoleService } from '@/features/role/role.service';
 
 @Injectable()
 export class AuthService {
@@ -19,6 +20,7 @@ export class AuthService {
     private jwt: JwtService,
     private config: ConfigService,
     private usersService: UsersService,
+    private roleService: RoleService
   ) {}
 
   async signin(dto: SigninDto): Promise<{ tokens: Tokens; user: any }> {
@@ -33,15 +35,22 @@ export class AuthService {
         username: true,
         email: true,
         hashedPassword: true,
-        // profile: {
-        //   select: {
-        //     name: true,
-        //     profilePic: true,
-        //     phone: true,
-        //     position: true,
-        //     address: true,
-        //   },
-        // },
+        profile: {
+          select: {
+            name: true,
+            profilePic: true,
+          },
+        },
+        userRoles: {
+          select: {
+            role: true
+          }
+        },
+        position: {
+          select: {
+            name: true
+          }
+        }
       },
     });
 
@@ -59,12 +68,12 @@ export class AuthService {
 
     // using access_token and refresh_token now, not just single jwt
     // return this.signToken(user.id, user.username, user.role);
+    const roles = await this.roleService.getUserRoles(user.id);
     const tokens = await this.signTokens({
       sub: user.id,
       username: user.username,
-      role: '',
+      roles: roles.map(role => role.roleName),
     });
-
     await this.updateRtHash(user.id, tokens.refresh_token);
 
     return { tokens, user };
@@ -98,10 +107,11 @@ export class AuthService {
     if (!user || !user.hashedRT) throw new ForbiddenException('Access Denied');
     const rtMatches = await verify(user.hashedRT, rt);
     if (!rtMatches) throw new ForbiddenException('Access Denied');
+    const userRoles = await this.roleService.getUserRoles(user.id);
     const tokens = await this.signTokens({
       sub: user.id,
       username: user.username,
-      role: '',
+      roles: userRoles.map(role => role.roleName),
     });
 
     await this.updateRtHash(user.id, tokens.refresh_token);
