@@ -114,9 +114,9 @@ export class UsersService {
     // const decodedUserInfo = req.user as { id: string; email: string };
     const user = await this.db.user.findUnique({
       where: { id },
-      // include: {
-      //   profile: true,
-      // },
+      include: {
+        profile: true,
+      },
     });
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);
@@ -130,10 +130,10 @@ export class UsersService {
 
   async getAll(): Promise<any[]> {
     const records = await this.db.user.findMany({
-      // select: { id: true, email: true },
-      // include: {
-      //   profile: true,
-      // },
+      select: { id: true, email: true },
+      include: {
+        profile: true,
+      },
       orderBy: [
         {
           createdAt: 'desc',
@@ -160,9 +160,9 @@ export class UsersService {
     // find the user by username
     const user = await this.db.user.findUnique({
       where: { id },
-      // include: {
-      //   profile: true,
-      // },
+      include: {
+        profile: true,
+      },
     });
 
     return user;

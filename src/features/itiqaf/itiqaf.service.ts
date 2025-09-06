@@ -24,7 +24,6 @@ export class ItiqafService {
     return flattened;
   }
 
-
   private calculateAge(year: number, month: number, day: number): number {
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();

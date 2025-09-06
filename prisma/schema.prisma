@@ -254,6 +254,7 @@ model User {
   hashedPassword String    @map("hashed_password") @db.VarChar(100)
   hashedRT       String?   @map("hashed_rt") @db.VarChar(100)
   lastActive     DateTime?
+  lastActivity   String?
   createdAt      DateTime  @default(now()) @map("date_created")
   updatedAt      DateTime? @updatedAt @map("date_modified")
   profile        Profile?

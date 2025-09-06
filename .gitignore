@@ -49,7 +49,7 @@ secret.json
 # temp directory
 .temp
 .tmp
-client_secret.json
+client_secret*
 # Runtime data
 pids
 *.pid
